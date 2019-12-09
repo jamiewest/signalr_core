@@ -11,14 +11,6 @@ class HttpError implements Exception {
   final String errorMessage;
 }
 
-class TimeoutError implements Exception {
-  TimeoutError({
-    this.errorMessage = 'A timeout occured.'
-  });
-
-  final String errorMessage;
-}
-
 class AbortException implements Exception {
   AbortException({
     this.errorMessage = 'An abort occured.'

@@ -1,22 +1,5 @@
-A library for Dart developers.
+# ASP.NET Core SignalR Dart client
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+## Introduction
 
-## Usage
-
-A simple usage example:
-
-```dart
-import 'package:signalr/signalr.dart';
-
-main() {
-  var awesome = new Awesome();
-}
-```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
+ASP.NET Core **SignalR** is an open-source library that simplifies adding real-time web functionality to apps. Real-time web functionality enables server-side code to push content to clients instantly.

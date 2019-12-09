@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http/http.dart';
 import 'package:signalr/signalr.dart';
 
@@ -93,7 +95,10 @@ class LongPollingTransport implements Transport {
 
         final pollUrl = '${url}&_=${DateTime.now().millisecondsSinceEpoch}';
         _log(LogLevel.trace, '(LongPolling transport) polling: ${pollUrl}.');
-        final response = await _client.get(pollUrl, headers: headers);
+        final response = await _client.get(pollUrl, headers: headers).timeout(const Duration(milliseconds: 100000), onTimeout: () {
+          _log(LogLevel.warning, 'Timeout from HTTP request.');
+          throw TimeoutException('A timeout occurred.');
+        });
 
         if (response.statusCode == 204) {
           _log(LogLevel.information, '(LongPolling transport) Poll terminated by server.');
@@ -107,8 +112,9 @@ class LongPollingTransport implements Transport {
           _running = false;
         } else {
           // Process the response
-          if (response.body != null) {
+          if (response.body.isNotEmpty) {
             _log(LogLevel.trace, '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
+
             if (onReceive != null) {
               onReceive(response.body);
             }
@@ -124,7 +130,7 @@ class LongPollingTransport implements Transport {
         // Log but disregard errors that occur after stopping
         _log(LogLevel.trace, '(LongPolling transport) Poll errored after shutdown: ${e.message}');
       } else {
-        if (e is TimeoutError) {
+        if (e is TimeoutException) {
           // Ignore timeouts and reissue the poll.
           _log(LogLevel.trace, '(LongPolling transport) Poll timed out, reissuing.');
         } else {

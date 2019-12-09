@@ -9,6 +9,10 @@ class TextMessageFormat {
   }
 
   static List<String> parse(String input) {
+    if (input.isEmpty) {
+      throw Exception("Message is incomplete.");
+    }
+
     if (input[input.length - 1] != TextMessageFormat.recordSeparator) {
       throw Exception("Message is incomplete.");
     }

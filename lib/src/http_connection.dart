@@ -131,7 +131,7 @@ class HttpConnection implements Connection {
 
   factory HttpConnection.withUrl(String url, HttpConnectionOptions options) {
     return HttpConnection(
-      http.Client(),
+      (options.client != null) ? options.client : http.Client(),
       options.logging,
       options,
       url
