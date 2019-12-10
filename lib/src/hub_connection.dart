@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:signalr/signalr.dart';
 import 'package:signalr/src/connection.dart';
 import 'package:signalr/src/handshake_protocol.dart';
-import 'package:signalr/src/http_connection.dart';
-import 'package:signalr/src/http_connection_options.dart';
 import 'package:signalr/src/hub_protocol.dart';
 import 'package:signalr/src/logger.dart';
 import 'package:signalr/src/retry_policy.dart';
@@ -81,8 +79,8 @@ class HubConnection {
     keepAliveIntervalInMilliseconds = DEFAULT_PING_INTERVAL_IN_MS;
 
     _handshakeProtocol = HandshakeProtocol();
-    _connection.onReceive = (dynamic data) => _processIncomingData(data);
-    _connection.onClose = (Exception exception) => _connectionClosed();
+    _connection.onreceive = (dynamic data) => _processIncomingData(data);
+    _connection.onclose = (Exception exception) => _connectionClosed();
 
     _callbacks = {};
     _methods = {};
@@ -93,14 +91,6 @@ class HubConnection {
     _receivedHandshakeResponse = false;
     _connectionState = HubConnectionState.disconnected;
     _connectionStarted = false;
-  }
-
-  factory HubConnection.withUrl({String url, HttpConnectionOptions options}) {
-    return HubConnection(
-      connection: HttpConnection.withUrl(url, options),
-      logging: options.logging,
-      protocol: JsonHubProtocol()
-    );
   }
 
   /// The server timeout in milliseconds.

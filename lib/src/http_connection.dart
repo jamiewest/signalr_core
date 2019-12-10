@@ -117,33 +117,32 @@ class HttpConnection implements Connection {
   final dynamic features = {};
   String baseUrl;
   String connectionId;
-  OnReceive onReceive;
-  OnClose onClose;
+  OnReceive onreceive;
+  OnClose onclose;
 
   final int negotiateVersion = 1;
 
-  HttpConnection(
-    this._client, 
-    this._logging, 
-    this._options,
-    String url) {
-      baseUrl = url;
-  }
+  HttpConnection({
+    @required String url,
+    http.BaseClient client,
+    HttpConnectionOptions options,
+    Logging log
+  }) :
+    baseUrl = url,
+    _client = (client != null) ? client : http.Client(), 
+    _options = options,
+    _logging = options.logging {
+    _connectionState = ConnectionState.disconnected;
+    _connectionStarted = false;
 
-  factory HttpConnection.withUrl(String url, HttpConnectionOptions options) {
-    return HttpConnection(
-      (options.client != null) ? options.client : http.Client(),
-      options.logging,
-      options,
-      url
-    );
+    onreceive = null;
+    onclose = null;
   }
-
 
   Future<void> start({TransferFormat transferFormat = TransferFormat.binary}) async {
     _logging(LogLevel.debug, 'Starting connection with transfer format \'${transferFormat.toString()}\'.');
 
-    if (_connectionState == ConnectionState.disconnected) {
+    if (_connectionState != ConnectionState.disconnected) {
       return Future.error(Exception('Cannot start an HttpConnection that is not in the \'Disconnected\' state.'));
     }
 
@@ -280,11 +279,11 @@ class HttpConnection implements Connection {
     connectionId = null;
     _connectionState = ConnectionState.disconnected;
 
-    if (onClose != null && _connectionStarted) {
+    if (onclose != null && _connectionStarted) {
       _connectionStarted = false;
 
       try {
-          onClose(exception);
+          onclose(exception);
       } catch (e) {
         _logging(LogLevel.error, 'HttpConnection.onclose(${_exception.toString()}) threw error \'${e}\'.');
       }
@@ -431,8 +430,8 @@ class HttpConnection implements Connection {
   }
 
   Future<void> _startTransport({String url, TransferFormat transferFormat}) {
-    _transport.onReceive = onReceive;
-    _transport.onClose = (e) => _stopConnection(exception: e);
+    _transport.onreceive = onreceive;
+    _transport.onclose = (e) => _stopConnection(exception: e);
     return _transport.connect(url, transferFormat);
   }
 
@@ -446,13 +445,12 @@ class HttpConnection implements Connection {
 
   Future<void> _createTransport(
       String url,
-      Object requestedTransport,
+      dynamic requestedTransport,
       NegotiateResponse negotiateResponse,
       TransferFormat requestedTransferFormat) async {
 
     var connectUrl = _createConnectUrl(url, negotiateResponse.connectionToken);
     if (requestedTransport is Transport) {
-
       _logging(LogLevel.debug, 'Connection was provided an instance of Transport, using that directly.');
       _transport = requestedTransport;
       await _startTransport(url: connectUrl, transferFormat: requestedTransferFormat);
@@ -531,7 +529,7 @@ class HttpConnection implements Connection {
 
   bool _transportMatches(HttpTransportType requestedTransport, HttpTransportType actualTransport) {
     if (requestedTransport == null) {
-      return false;
+      return true;
     } else {
       return (requestedTransport.index == actualTransport.index);
     }

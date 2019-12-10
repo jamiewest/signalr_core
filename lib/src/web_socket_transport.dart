@@ -42,9 +42,9 @@ class WebSocketTransport implements Transport {
     _streamSubscription = _channel.stream.listen((data) {
       var dataDetail = getDataDetail(data, this.logMessageContent);
       logging(LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
-      if (onReceive != null) {
+      if (onreceive != null) {
         try {
-          onReceive(data);
+          onreceive(data);
         } catch (e1) {
           _close(e1);
           return;
@@ -75,28 +75,24 @@ class WebSocketTransport implements Transport {
 
   @override
   Future<void> stop() async {
-    // if (_webSocket != null) {
-    //   await _webSocket.close();
-      await _streamSubscription.cancel();
-      // _webSocket = null;
-    //}
+    await _streamSubscription.cancel();
 
     return Future.value(null);
   }
 
     @override
-  var onClose;
+  var onclose;
 
   @override
-  var onReceive;
+  var onreceive;
 
   void _close(Exception error) {
     logging(LogLevel.trace, '(WebSockets transport) socket closed.');
-    if (onClose != null) {
+    if (onclose != null) {
       if (error != null) {
-        onClose(error);
+        onclose(error);
       } else {
-        onClose(null);
+        onclose(null);
       }
     }
   }

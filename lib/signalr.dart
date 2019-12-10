@@ -11,6 +11,7 @@ export 'src/handshake_protocol.dart';
 export 'src/http_connection_options.dart';
 export 'src/http_connection.dart';
 export 'src/hub_connection.dart';
+export 'src/hub_connection_builder.dart';
 export 'src/hub_protocol.dart';
 export 'src/json_hub_protocol.dart';
 export 'src/logger.dart';

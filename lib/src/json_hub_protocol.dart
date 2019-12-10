@@ -63,7 +63,7 @@ class JsonHubProtocol implements HubProtocol {
           break;
         default:
           // Future protocol changes can add message types, old clients can ignore them
-          logging(LogLevel.information, "Unknown message type '" + parsedMessage.type.toString() + "' ignored.");
+          logging(LogLevel.information, 'Unknown message type \'' + parsedMessage.type.toString() + '\' ignored.');
           continue;
       }
       hubMessages.add(parsedMessage);

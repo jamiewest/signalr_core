@@ -28,15 +28,15 @@ class ServerSentEventsTransport implements Transport {
     _log = logging,
     _logMessageContent = logMessageContent,
     _withCredentials = withCredentials {
-    onClose = null;
-    onReceive = null;
+    onclose = null;
+    onreceive = null;
   }
 
   @override
-  var onClose;
+  var onclose;
 
   @override
-  var onReceive;
+  var onreceive;
 
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {
@@ -71,7 +71,7 @@ class ServerSentEventsTransport implements Transport {
 
     eventSource.stream.listen((data) {
       _log(LogLevel.trace, '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
-      onReceive(data);
+      onreceive(data);
     }, onError: (e) {
       if (opened) {
         _close(exception: e);
@@ -102,8 +102,8 @@ class ServerSentEventsTransport implements Transport {
       _eventSource.close();
       _eventSource = null;
 
-      if (onClose != null) {
-        onClose(exception);
+      if (onclose != null) {
+        onclose(exception);
       }
     }
   }

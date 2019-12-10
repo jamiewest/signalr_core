@@ -15,9 +15,6 @@ class LongPollingTransport implements Transport {
   Future<void> _receiving;
   Exception _closeError;
 
-  OnReceive _onreceive;
-  OnClose _onclose;
-
   LongPollingTransport({
     BaseClient client, 
     AccessTokenFactory accessTokenFactory,
@@ -32,15 +29,15 @@ class LongPollingTransport implements Transport {
     _withCredentials = withCredentials {
 
     _running = false;
-    _onreceive = null;
-    _onclose = null;
+    onreceive = null;
+    onclose = null;
   }
 
   @override
-  var onClose;
+  var onclose;
 
   @override
-  var onReceive;
+  var onreceive;
 
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {
@@ -115,8 +112,8 @@ class LongPollingTransport implements Transport {
           if (response.body.isNotEmpty) {
             _log(LogLevel.trace, '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
 
-            if (onReceive != null) {
-              onReceive(response.body);
+            if (onreceive != null) {
+              onreceive(response.body);
             }
           } else {
             // This is another way timeout manifest.
@@ -194,13 +191,13 @@ class LongPollingTransport implements Transport {
   }
 
   void _raiseOnClose() {
-    if (onClose !=null) {
+    if (onclose !=null) {
       var logMessage = '(LongPolling transport) Firing onclose event.';
       if (_closeError != null) {
         logMessage += ' Error: ' + _closeError.toString();
       }
       _log(LogLevel.trace, logMessage);
-      onClose(_closeError);
+      onclose(_closeError);
     }
   }
 }

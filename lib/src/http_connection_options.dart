@@ -18,7 +18,7 @@ class HttpConnectionOptions {
   final BaseClient client;
 
   /// An [HttpTransportType] value specifying the transport to use for the connection.
-  final HttpTransportType transport;
+  final dynamic transport;
 
   /// Configures the logger used for logging.
   /// 
