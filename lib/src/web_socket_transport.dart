@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:signalr/src/logger.dart';
 import 'package:signalr/src/transport.dart';
@@ -7,7 +6,6 @@ import 'package:signalr/src/utils.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketTransport implements Transport {
-  WebSocket _webSocket;
   StreamSubscription<dynamic> _streamSubscription;
   WebSocketChannel _channel;
 
@@ -77,11 +75,11 @@ class WebSocketTransport implements Transport {
 
   @override
   Future<void> stop() async {
-    if (_webSocket != null) {
-      await _webSocket.close();
+    // if (_webSocket != null) {
+    //   await _webSocket.close();
       await _streamSubscription.cancel();
-      _webSocket = null;
-    }
+      // _webSocket = null;
+    //}
 
     return Future.value(null);
   }

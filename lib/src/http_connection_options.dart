@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:http/http.dart';
 import 'package:signalr/src/transport.dart';
 import 'package:signalr/src/utils.dart';

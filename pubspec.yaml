@@ -13,6 +13,11 @@ dependencies:
   tuple: ^1.0.3
   web_socket_channel: ^1.1.0
 
+  sse:
+    git:
+      url: https://github.com/jamiewest/sse.git
+      ref: f6822b9665afded7f9b52579ba44361991f943cd
+
 dev_dependencies:
   pedantic: ^1.8.0
   test: ^1.6.0

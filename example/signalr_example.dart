@@ -15,7 +15,7 @@ main() async {
   var connection = HubConnection.withUrl(
     url: 'http://localhost:5000/chatHub', 
     options: HttpConnectionOptions(
-      transport: HttpTransportType.longPolling, 
+      transport: HttpTransportType.serverSentEvents, 
       //client: CustomClient(Client()),
       logging: (level, message) {
         switch (level) {

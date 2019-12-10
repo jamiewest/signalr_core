@@ -6,6 +6,7 @@ import 'package:signalr/src/connection.dart';
 import 'package:signalr/src/http_connection_options.dart';
 import 'package:signalr/src/logger.dart';
 import 'package:signalr/src/long_polling_transport.dart';
+import 'package:signalr/src/server_sent_events_transport.dart';
 import 'package:signalr/src/transport.dart';
 import 'package:meta/meta.dart';
 import 'package:signalr/src/utils.dart';
@@ -386,6 +387,7 @@ class HttpConnection implements Connection {
     //headers['X-SignalR-User-Agent'] = 'Microsoft SignalR/';
     headers['Content-Type'] = 'text/plain;charset=UTF-8';
     //headers['X-Requested-With'] = 'boop';
+    //headers['Access-Control-Allow-Origin'] = '*';
 
     try {
       final response = await _client.post(negotiateUrl,
@@ -548,7 +550,12 @@ class HttpConnection implements Connection {
         );
         break;
       case HttpTransportType.serverSentEvents:
-        // TODO: Handle this case.
+        return ServerSentEventsTransport(
+          accessTokenFactory: _accessTokenFactory,
+          logMessageContent: _options.logMessageContent,
+          logging: _logging,
+          client: _client
+        );
         break;
       case HttpTransportType.longPolling:
         return LongPollingTransport(
