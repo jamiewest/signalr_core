@@ -72,7 +72,7 @@ class HandshakeProtocol {
       final separatorIndex =
           textData.indexOf(TextMessageFormat.recordSeparator);
       if (separatorIndex == -1) {
-        throw Exception("Message is incomplete.");
+        throw Exception('Message is incomplete.');
       }
 
       // content before separator is handshake response
@@ -90,7 +90,7 @@ class HandshakeProtocol {
     final response = HandshakeResponseMessageExtensions.fromJson(json.decode(messages[0]));
 
     // if (response.type) {
-    //     throw new Error("Expected a handshake response from the server.");
+    //   throw new Error("Expected a handshake response from the server.");
     // }
 
     _responseMessage = response;

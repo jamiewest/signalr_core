@@ -6,7 +6,6 @@ library signalr;
 
 export 'src/connection.dart';
 export 'src/default_reconnect_policy.dart';
-export 'src/errors.dart';
 export 'src/handshake_protocol.dart';
 export 'src/http_connection_options.dart';
 export 'src/http_connection.dart';

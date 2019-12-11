@@ -63,7 +63,7 @@ class LongPollingTransport implements Transport {
       _log(LogLevel.error, '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
 
       // Mark running as false so that the poll immediately ends and runs the close logic
-      _closeError = HttpError(statusCode: response.statusCode);
+      _closeError = Exception(response.statusCode);
       _running = false;
 
     } else {
@@ -105,7 +105,7 @@ class LongPollingTransport implements Transport {
           _log(LogLevel.error, '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
 
           // Unexpected status code
-          _closeError = HttpError(statusCode: response.statusCode);
+          _closeError = Exception(response.statusCode);
           _running = false;
         } else {
           // Process the response
