@@ -34,6 +34,7 @@ enum HubConnectionState {
   reconnecting
 }
 
+/// Represents a connection to a SignalR Hub.
 class HubConnection {
   final dynamic _cachedPingMessage;
   final Connection _connection;
@@ -129,6 +130,7 @@ class HubConnection {
     _connection.baseUrl = url;
   }
 
+  /// Starts the connection.
   Future<void> start() {
     _startFuture = _startWithStateTransitions();
     return _startFuture;
@@ -260,6 +262,19 @@ class HubConnection {
     // or the onclose callback is invoked. The onclose callback will transition the HubConnection
     // to the disconnected state if need be before HttpConnection.stop() completes.
     return _connection.stop(exception: exception);
+  }
+
+  /// Invokes a hub method on the server using the specified name and arguments. Does not wait for a response from the receiver.
+  ///
+  /// The Promise returned by this method resolves when the client has sent the invocation to the server. The server may still
+  /// be processing the invocation.
+  Future<void> send({String methodName, List<dynamic> args}) {
+    final Tuple2<Map<int, Stream<dynamic>>, List<String>> streamParameters = _replaceStreamParameters(args);
+    final sendPromise = _sendWithProtocol(_createInvocation(methodName: methodName, args: args, nonblocking: true, streamIds: streamParameters.item2));
+
+    _launchStreams(streamParameters.item1, sendPromise);
+
+    return sendPromise;
   }
 
   Future<void> _sendMessage(dynamic message) {
@@ -425,13 +440,65 @@ class HubConnection {
     }
   }
 
+  /// Invokes a streaming hub method on the server using the specified name and arguments.
+  Stream<T> stream<T>(String methodName, {List<dynamic> args}) {
+    final Tuple2<Map<int, Stream<dynamic>>, List<String>> streamParameters = _replaceStreamParameters(args);
+    final invocationDescriptor = _createStreamInvocation(methodName: methodName, args: args, streamIds: streamParameters.item2);
+
+    Future<void> futureQueue;
+    final controller = StreamController<T>();
+    controller.onCancel = () {
+      final cancelInvocation = _createCancelInvocation(id: invocationDescriptor.invocationId);
+
+      _callbacks.remove(invocationDescriptor.invocationId);
+
+      futureQueue.then((value) {
+        return _sendWithProtocol(cancelInvocation);
+      });
+    };
+
+    _callbacks[invocationDescriptor.invocationId] = (HubMessage invocationEvent, Exception error) {
+      if (error != null) {
+        controller.addError(error);
+        return;
+      } else if (invocationEvent != null) {
+        if (invocationEvent.type == MessageType.completion) {
+          if (invocationEvent is CompletionMessage) {
+            if (invocationEvent.error != null) {
+              if (invocationEvent.error.isNotEmpty) {
+                controller.addError(Exception(error));
+              } else {
+                controller.close();
+              }
+            } else {
+              controller.close();
+            }
+          }
+        } else {
+          if (invocationEvent is StreamItemMessage) {
+            controller.add((invocationEvent.item) as T);
+          }
+        }
+      }
+    };
+
+    futureQueue = _sendWithProtocol(invocationDescriptor).catchError((e){
+      controller.addError(e);
+      _callbacks.remove(invocationDescriptor.invocationId);
+    });
+
+    _launchStreams(streamParameters.item1, futureQueue);
+
+    return controller.stream;
+  }
+
   /// Invokes a hub method on the server using the specified name and arguments.
   /// 
   /// The Future returned by this method resolves when the server indicates it has finished invoking the method. When the future
   /// resolves, the server has finished invoking the method. If the server method returns a result, it is produced as the result of
   /// resolving the Future.
   Future<dynamic> invoke(String methodName, {List<dynamic> args}) {
-    final Tuple2<List<Stream<dynamic>>, List<String>> streamParameters = _replaceStreamParameters(args);
+    final Tuple2<Map<int, Stream<dynamic>>, List<String>> streamParameters = _replaceStreamParameters(args);
     final invocationDescriptor = _createInvocation(
       methodName: methodName, 
       args: args, 
@@ -469,8 +536,8 @@ class HubConnection {
     return p.future;
   }
 
-  Tuple2<dynamic, List<String>> _replaceStreamParameters(List<dynamic> args) {
-    final List<Stream<dynamic>> streams = [];
+  Tuple2<Map<int, Stream<dynamic>>, List<String>> _replaceStreamParameters(List<dynamic> args) {
+    final Map<int, Stream<dynamic>> streams = {};
     final List<String> streamIds = [];
 
     for (var i = 0; i < args.length; i++) {
@@ -487,9 +554,10 @@ class HubConnection {
       }
     }
 
-    return Tuple2<List<Stream<dynamic>>, List<String>>(streams, streamIds);
+    return Tuple2<Map<int, Stream<dynamic>>, List<String>>(streams, streamIds);
   }
 
+  /// Registers a handler that will be invoked when the hub method with the specified method name is invoked.
   void on(String methodName, MethodInvacationFunc newMethod) {
     if (methodName.isEmpty || newMethod == null) {
       return;
@@ -508,6 +576,7 @@ class HubConnection {
     _methods[methodName].add(newMethod);
   }
 
+  /// Removes all handlers for the specified hub method.
   void off(String methodName, {MethodInvacationFunc method}) {
     if (methodName.isEmpty) {
       return;
@@ -553,14 +622,13 @@ class HubConnection {
             _invokeClientMethod(message);
             break;
           case MessageType.streamItem:
-            break;
           case MessageType.completion:
-            var completionMessage = message as CompletionMessage;
-            final callback = _callbacks[completionMessage.invocationId]; 
+            var invovationMessage = message as HubInvocationMessage;
+            final callback = _callbacks[invovationMessage.invocationId]; 
 
             if (callback != null) {
               if (message.type == MessageType.completion) {
-                _callbacks.remove(completionMessage.invocationId);
+                _callbacks.remove(invovationMessage.invocationId);
               }
               callback(message, null);
             }
@@ -724,7 +792,7 @@ class HubConnection {
     return CompletionMessage(invocationId: id, result: result);
   }
 
-  void _launchStreams(List<Stream> streams, Future<void> futureQueue) {
+  void _launchStreams(Map<int, Stream> streams, Future<void> futureQueue) {
     if (streams.isEmpty) {
       return;
     }
@@ -733,29 +801,32 @@ class HubConnection {
       futureQueue = Completer<void>().future;
     }
 
-    streams.forEach((stream) {
+    streams.forEach((streamId, stream) {
       stream.listen((data) {
-        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createStreamItemMessage(id: '1', item: data)));
+        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createStreamItemMessage(id: streamId.toString(), item: data)));
       }, onDone: () {
-        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createCompletionMessage(id: '1')));
+        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createCompletionMessage(id:  streamId.toString())));
       }, onError: (e) {
-        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createCompletionMessage(id: '1', exception: e)));
+        futureQueue = futureQueue.then((_) => _sendWithProtocol(_createCompletionMessage(id:  streamId.toString(), exception: e)));
       });
     });
   }
 
+  /// Registers a handler that will be invoked when the connection is closed.
   void onclose(ClosedCallback callback) {
     if (callback != null) {
       _closedCallbacks.add(callback);
     }
   }
 
+  /// Registers a handler that will be invoked when the connection starts reconnecting.
   void onreconnecting(ReconnectingCallback callback) {
     if (callback != null) {
       _reconnectingCallbacks.add(callback);
     }
   }
 
+  /// Registers a handler that will be invoked when the connection successfully reconnects.
   void onreconnected(ReconnectedCallback callback) {
     if (callback != null) {
       _reconnectedCallbacks.add(callback);

@@ -1,8 +1,8 @@
 name: signalr
-description: A starting point for Dart libraries or applications.
-# version: 1.0.0
-# homepage: https://github.com/jamiewest/signalr
-# author: Jamie West <jamiewst@gmail.com>
+description: ASP.NET Core SignalR Client.
+version: 1.0.0
+Homepage: https://github.com/jamiewest/signalr
+author: Jamie West
 
 environment:
   sdk: '>=2.6.0 <3.0.0'

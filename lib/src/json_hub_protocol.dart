@@ -8,6 +8,7 @@ import 'package:signalr/src/utils.dart';
 
 const String jsonHubProtocolName = "json";
 
+/// Implements the JSON Hub Protocol.
 class JsonHubProtocol implements HubProtocol {
   @override
   String get name => jsonHubProtocolName;
@@ -18,6 +19,7 @@ class JsonHubProtocol implements HubProtocol {
   @override
   TransferFormat get transferFormat => TransferFormat.text;
 
+  /// Creates an array of [HubMessage] objects from the specified serialized representation.
   @override
   List<HubMessage> parseMessages(dynamic input, Logging logging) {
     // Only JsonContent is allowed.
@@ -72,23 +74,31 @@ class JsonHubProtocol implements HubProtocol {
     return hubMessages;
   }
 
+  /// Writes the specified [HubMessage] to a string and returns it.
   @override
   String writeMessage(HubMessage message) {
     switch (message.type) {
       case MessageType.undefined:
         break;
       case MessageType.invocation:
+        print((message as InvocationMessage).toJson());
         return TextMessageFormat.write(json.encode((message as InvocationMessage).toJson()));
         break;
       case MessageType.streamItem:
+      print((message as StreamItemMessage).toJson());
         return TextMessageFormat.write(json.encode((message as StreamItemMessage).toJson()));
         break;
       case MessageType.completion:
+      print((message as CompletionMessage).toJson());
         return TextMessageFormat.write(json.encode((message as CompletionMessage).toJson()));
         break;
       case MessageType.streamInvocation:
+      print((message as StreamInvocationMessage).toJson());
+        return TextMessageFormat.write(json.encode((message as StreamInvocationMessage).toJson()));
         break;
       case MessageType.cancelInvocation:
+      print((message as CancelInvocationMessage).toJson());
+        return TextMessageFormat.write(json.encode((message as CancelInvocationMessage).toJson()));
         break;
       case MessageType.ping:
         return TextMessageFormat.write(json.encode((message as PingMessage).toJson()));
@@ -166,16 +176,31 @@ extension InvocationMessageExtensions on InvocationMessage {
       target: json['target'],
       arguments: (json['arguments'] as List)?.map((item) => item as Object)?.toList(),
       headers: json['headers'],
-      invocationId: json['invocationId']
+      invocationId: json['invocationId'],
+      streamIds: json['streamIds']
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'type': this.type.value,
+      if (this.invocationId != null) 
+        'invocationId': this.invocationId,
+      'target': this.target,
+      'arguments': this.arguments,
+      'streamIds': this.streamIds
+    };
+  }
+}
+
+extension StreamInvocationMessageExtensions on StreamInvocationMessage {
+  Map<String, dynamic> toJson() {
+    return {
+      'type': this.type.value,
       'invocationId': this.invocationId,
       'target': this.target,
-      'arguments': this.arguments
+      'arguments': this.arguments,
+      'streamIds': this.streamIds
     };
   }
 }
@@ -192,8 +217,17 @@ extension StreamItemMessageExtensions on StreamItemMessage {
   Map<String, dynamic> toJson() {
     return {
       'type': this.type.value,
-      'invocationType': this.invocationId,
       'item': this.item,
+      'invocationId': this.invocationId
+    };
+  }
+}
+
+extension CancelInvocationMessageExtensions on CancelInvocationMessage {
+  Map<String, dynamic> toJson() {
+    return {
+      'type': this.type.value,
+      'invocationId': this.invocationId,
     };
   }
 }
@@ -211,7 +245,7 @@ extension CompletionMessageExtensions on CompletionMessage {
   Map<String, dynamic> toJson() {
     return {
       'type': this.type.value,
-      'invocationType': this.invocationId,
+      'invocationId': this.invocationId,
       'result': this.result,
       'error': this.error,
     };

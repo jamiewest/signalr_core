@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -170,19 +171,17 @@ class HttpConnection implements Connection {
     _connectionStarted = true;
   }
 
-  Future<void> send(dynamic data) async {
+  Future<void> send(dynamic data) {
     if (_connectionState != ConnectionState.connected) {
       return Future.error(Exception('Cannot send data if the connection is not in the \'Connected\' State.'));
     }
 
-    // if (_sendQueue == null) {
-    //   _sendQueue = TransportSendQueue(transport: _transport);
-    // }
+    if (_sendQueue == null) {
+      _sendQueue = TransportSendQueue(transport: _transport);
+    }
 
     // Transport will not be null if state is connected
-    //return _sendQueue.send(data);
-
-    return await _transport.send(data);
+    return _sendQueue.send(data);
   }
 
   Future<void> stop({Exception exception}) async {
@@ -197,6 +196,10 @@ class HttpConnection implements Connection {
     }
 
     _connectionState = ConnectionState.disconnecting;
+
+    // _stopFuture = Future(() => {
+    //   _stopFutureResolver = 
+    // });
 
     _stopFuture = Future.value((resolve) {
       _stopFutureResolver = resolve;
@@ -348,6 +351,7 @@ class HttpConnection implements Connection {
         await _createTransport(url, _options.transport, negotiateResponse, transferFormat);
       }
 
+      // TODO: Figure out how to check for dynamic properties.
       // if (_transport is LongPollingTransport) {
       //   features.inherentKeepAlive = true;
       // }
@@ -383,10 +387,9 @@ class HttpConnection implements Connection {
     final negotiateUrl = _resolveNegotiateUrl(url);
     _logging(LogLevel.debug, 'Sending negotiation request: ${negotiateUrl}.');
 
+    // TODO: Fix user agent header...
     //headers['X-SignalR-User-Agent'] = 'Microsoft SignalR/';
     headers['Content-Type'] = 'text/plain;charset=UTF-8';
-    //headers['X-Requested-With'] = 'boop';
-    //headers['Access-Control-Allow-Origin'] = '*';
 
     try {
       final response = await _client.post(negotiateUrl,
@@ -419,13 +422,13 @@ class HttpConnection implements Connection {
   }
 
   static String _resolveNegotiateUrl(String url) {
-    final index = url.indexOf("?");
+    final index = url.indexOf('?');
     var negotiateUrl = url.substring(0, index == -1 ? url.length : index);
-    if (negotiateUrl[negotiateUrl.length - 1] != "/") {
-      negotiateUrl += "/";
+    if (negotiateUrl[negotiateUrl.length - 1] != '/') {
+      negotiateUrl += '/';
     }
-    negotiateUrl += "negotiate";
-    negotiateUrl += index == -1 ? "" : url.substring(index);
+    negotiateUrl += 'negotiate';
+    negotiateUrl += index == -1 ? '' : url.substring(index);
     return negotiateUrl;
   }
 
@@ -439,6 +442,7 @@ class HttpConnection implements Connection {
     if (connectionToken == null) {
       return url;
     }
+    // TODO: Look at this...
     return url + '?' + 'id=$connectionToken';
     //return url + (url.contains('?') ? '?' : '&') + 'id=$connectionToken';
   }
@@ -569,78 +573,80 @@ class HttpConnection implements Connection {
 }
 
 class TransportSendQueue {
-  List _buffer = [];
-  Future<void> _sendBufferedData;
+  List<dynamic> _buffer = [];
+  Completer _sendBufferedData;
   bool _executing = true;
-  Future<void> _transportResult;
+  Completer _transportResult;
   Future<void> _sendLoopPromise;
 
   final Transport transport;
 
   TransportSendQueue({this.transport}) {
-    //_sendBufferedData = FutureSource();
-    //_transportResult = FutureSource();
+    _sendBufferedData = Completer();
+    _transportResult = Completer();
 
     _sendLoopPromise = sendLoop();
   }
 
   Future<void> send (dynamic data) {
     _bufferData(data);
-        if (_transportResult == null) {
-            //_transportResult = FutureSource();
-        }
-        //return _transportResult.future;
+      if (_transportResult == null) {
+        _transportResult = Completer();
+      }
+      return _transportResult.future;
   }
 
   Future<void> stop() {
     _executing = false;
-    //_sendBufferedData.resolve();
+    _sendBufferedData.complete();
     return _sendLoopPromise;
   }
 
   void _bufferData(dynamic data) {
+    // TODO: I believe this is checking that the buffer contains already similar data, if not throw error.
+    // fix this.
     if (_buffer.isNotEmpty) {
-      throw Exception('Expected data to be of type ${_buffer.toString()} but was of type ${data.toString()}');
+      //throw Exception('Expected data to be of type ${_buffer.toString()} but was of type ${data.toString()}');
     }
 
     _buffer.add(data);
-    //_sendBufferedData.resolve();
+    _sendBufferedData.complete();
   }
 
   Future<void> sendLoop() async {
     while (true) {
-            //await _sendBufferedData.future;
+      await _sendBufferedData.future;
 
-            if (!_executing) {
-                if (_transportResult != null) {
-                    //_transportResult.reject(Exception('Connection stopped.'));
-                }
-
-                break;
-            }
-
-            //_sendBufferedData = FutureSource();
-
-            //final transportResult = _transportResult;
-            //_transportResult = null;
-
-            var data;
-            if (_buffer.isNotEmpty) {
-              data = (_buffer[0] is String) 
-                ? _buffer.join('') 
-                : TransportSendQueue._concatBuffers(_buffer);
-              
-              _buffer.clear();
-
-              try {
-                await transport.send(data);
-                //transportResult.resolve();
-            } catch (error) {
-                //transportResult.reject(error);
-            }
-            }
+      if (!_executing) {
+        if (_transportResult != null) {
+          _transportResult.completeError(Exception('Connection stopped.'));
         }
 
+        break;
+      }
+
+      _sendBufferedData = Completer();
+
+      final transportResult = _transportResult;
+      _transportResult = null;
+
+      var data;
+      if (_buffer.isNotEmpty) {
+        
+        data = (_buffer[0] is String) 
+          ? _buffer.join('') 
+          : TransportSendQueue._concatBuffers(_buffer);
+        
+        _buffer.clear();
+
+        try {
+          await transport.send(data);
+          transportResult.complete();
+        } catch (error) {
+          transportResult.completeError(error);
+        }
+      }
+    }
   }
 
   static ByteBuffer _concatBuffers(List<ByteBuffer> byteBuffers) {
@@ -656,27 +662,3 @@ class TransportSendQueue {
     return result.buffer;
   }
 }
-
-// typedef Resolver = void Function();
-// typedef Rejector = void Function(dynamic reason);
-
-// class FutureSource {
-//   Resolver _resolver;
-//   Rejector _rejector;
-//   Future<void> future;
-
-//   FutureSource() {
-//     future = Future.value((resolve, reject) {
-//       _resolver = resolve;
-//       _rejector = reject;
-//     });
-//   }
-
-//   void resolve() {
-//       _resolver();
-//     }
-
-//     void reject(dynamic reason) {
-//       _rejector(reason);
-//     }
-// }
