@@ -1,6 +1,6 @@
-import 'package:signalr/src/hub_protocol.dart';
-import 'package:signalr/src/json_hub_protocol.dart';
-import 'package:signalr/src/text_message_format.dart';
+import 'package:signalr_core/src/hub_protocol.dart';
+import 'package:signalr_core/src/json_hub_protocol.dart';
+import 'package:signalr_core/src/text_message_format.dart';
 import 'package:test/test.dart';
 
 void main() {

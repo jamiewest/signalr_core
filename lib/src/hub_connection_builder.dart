@@ -1,4 +1,4 @@
-import 'package:signalr/signalr.dart';
+import 'package:signalr_core/signalr_core.dart';
 
 /// A builder for configuring [HubConnection] instances.
 class HubConnectionBuilder {

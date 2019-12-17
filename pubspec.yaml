@@ -1,7 +1,7 @@
-name: signalr
+name: signalr_core
 description: ASP.NET Core SignalR Client.
 version: 1.0.0
-Homepage: https://github.com/jamiewest/signalr
+Homepage: https://github.com/jamiewest/signalr_core
 author: Jamie West
 
 environment:
@@ -12,11 +12,7 @@ dependencies:
   logging: ^0.11.3+2
   tuple: ^1.0.3
   web_socket_channel: ^1.1.0
-
-  sse:
-    git:
-      url: https://github.com/jamiewest/sse.git
-      ref: f6822b9665afded7f9b52579ba44361991f943cd
+  sse_client: ^0.0.1
 
 dev_dependencies:
   pedantic: ^1.8.0

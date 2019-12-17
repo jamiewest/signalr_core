@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:signalr/src/connection.dart';
-import 'package:signalr/src/http_connection_options.dart';
-import 'package:signalr/src/logger.dart';
-import 'package:signalr/src/long_polling_transport.dart';
-import 'package:signalr/src/server_sent_events_transport.dart';
-import 'package:signalr/src/transport.dart';
+import 'package:signalr_core/src/connection.dart';
+import 'package:signalr_core/src/http_connection_options.dart';
+import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/long_polling_transport.dart';
+import 'package:signalr_core/src/server_sent_events_transport.dart';
+import 'package:signalr_core/src/transport.dart';
 import 'package:meta/meta.dart';
-import 'package:signalr/src/utils.dart';
-import 'package:signalr/src/web_socket_transport.dart';
+import 'package:signalr_core/src/utils.dart';
+import 'package:signalr_core/src/web_socket_transport.dart';
 
 enum ConnectionState {
   connecting,

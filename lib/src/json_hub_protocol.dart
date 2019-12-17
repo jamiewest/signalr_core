@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:signalr/src/hub_protocol.dart';
-import 'package:signalr/src/logger.dart';
-import 'package:signalr/src/text_message_format.dart';
-import 'package:signalr/src/transport.dart';
-import 'package:signalr/src/utils.dart';
+import 'package:signalr_core/src/hub_protocol.dart';
+import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/text_message_format.dart';
+import 'package:signalr_core/src/transport.dart';
+import 'package:signalr_core/src/utils.dart';
 
 const String jsonHubProtocolName = "json";
 
@@ -81,23 +81,18 @@ class JsonHubProtocol implements HubProtocol {
       case MessageType.undefined:
         break;
       case MessageType.invocation:
-        print((message as InvocationMessage).toJson());
         return TextMessageFormat.write(json.encode((message as InvocationMessage).toJson()));
         break;
       case MessageType.streamItem:
-      print((message as StreamItemMessage).toJson());
         return TextMessageFormat.write(json.encode((message as StreamItemMessage).toJson()));
         break;
       case MessageType.completion:
-      print((message as CompletionMessage).toJson());
         return TextMessageFormat.write(json.encode((message as CompletionMessage).toJson()));
         break;
       case MessageType.streamInvocation:
-      print((message as StreamInvocationMessage).toJson());
         return TextMessageFormat.write(json.encode((message as StreamInvocationMessage).toJson()));
         break;
       case MessageType.cancelInvocation:
-      print((message as CancelInvocationMessage).toJson());
         return TextMessageFormat.write(json.encode((message as CancelInvocationMessage).toJson()));
         break;
       case MessageType.ping:

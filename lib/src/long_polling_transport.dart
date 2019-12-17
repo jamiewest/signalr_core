@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:http/http.dart';
-import 'package:signalr/signalr.dart';
+import 'package:signalr_core/signalr_core.dart';
 
 class LongPollingTransport implements Transport {
   BaseClient _client;

@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:signalr/src/logger.dart';
-import 'package:signalr/src/transport.dart';
-import 'package:signalr/src/utils.dart';
+import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/transport.dart';
+import 'package:signalr_core/src/utils.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketTransport implements Transport {
@@ -36,48 +36,58 @@ class WebSocketTransport implements Transport {
       }
     }
 
+    final connectFuture = Completer<void>();
+    bool opened = false;
     url = url.replaceFirst(RegExp(r'^http'), 'ws');
-    _channel = WebSocketChannel.connect(Uri.parse(url));
 
-    _streamSubscription = _channel.stream.listen((data) {
-      var dataDetail = getDataDetail(data, this.logMessageContent);
-      logging(LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
-      if (onreceive != null) {
-        try {
-          onreceive(data);
-        } catch (e1) {
-          _close(e1);
-          return;
+    try {
+      _channel = WebSocketChannel.connect(Uri.parse(url));
+      logging(LogLevel.information, 'WebSocket connected to $url.');
+      opened = true;
+
+      _streamSubscription = _channel.stream.listen((data) {
+        var dataDetail = getDataDetail(data, this.logMessageContent);
+        logging(LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
+        if (onreceive != null) {
+          try {
+            onreceive(data);
+          } catch (e1) {
+            _close(e1);
+          }
         }
-      }
-    }, onError: (e) {
-      print(e.toString());
-    }, onDone: () {
-      print('done');
-    }, cancelOnError: false);
+      }, onError: (e) {
+        print(e);
+      }, onDone: () {
+        if (opened == true) {
+          _close(null);
+        } else {
+          
+        }
+      }, cancelOnError: false);
 
-    logging(LogLevel.information, 'WebSocket connected to $url.');
+      return connectFuture.complete();
+    } catch (e) {
+      return connectFuture.completeError(e);
+    }
 
-    return Future.value(null);
   }
 
   @override
   Future<void> send(dynamic data) {
-    if (_channel != null) {
-      var dataDetail = getDataDetail(data, this.logMessageContent);
-      logging(LogLevel.trace, '(WebSockets transport) sending data. $dataDetail.');
-      _channel.sink.add(data);
-      return Future.value(null);
+    if ((_channel == null) || (_channel?.closeCode != null)) {
+      return Future.error(Exception('WebSocket is not in the OPEN state'));
     }
 
-    return Future.error(Exception('WebSocket is not in the OPEN state'));
+    logging(LogLevel.trace, '(WebSockets transport) sending data. ${getDataDetail(data, this.logMessageContent)}.');
+    _channel.sink.add(data);
+    return Future.value();
   }
 
   @override
   Future<void> stop() async {
     await _streamSubscription.cancel();
 
-    return Future.value(null);
+    return Future.value();
   }
 
     @override

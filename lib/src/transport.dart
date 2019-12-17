@@ -1,4 +1,4 @@
-import 'package:signalr/signalr.dart';
+import 'package:signalr_core/signalr_core.dart';
 
 /// Specifies a specific HTTP transport type.
 ///

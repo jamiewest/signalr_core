@@ -1,6 +1,6 @@
 import 'package:http/http.dart';
-import 'package:signalr/src/transport.dart';
-import 'package:signalr/src/utils.dart';
+import 'package:signalr_core/src/transport.dart';
+import 'package:signalr_core/src/utils.dart';
 
 /// Options provided to the 'withUrl' factory constructor on [HubConnection] to configure options for the HTTP-based transports.
 class HttpConnectionOptions {

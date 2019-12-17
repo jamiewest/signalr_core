@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:http/http.dart';
-import 'package:signalr/src/logger.dart';
-import 'package:signalr/src/transport.dart';
-import 'package:signalr/src/utils.dart';
+import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/transport.dart';
+import 'package:signalr_core/src/utils.dart';
 
-import 'package:sse/sse.dart';
+import 'package:sse_client/sse_client.dart';
 
 class ServerSentEventsTransport implements Transport {
   BaseClient _client;

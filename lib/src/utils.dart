@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart';
-import 'package:signalr/src/logger.dart';
+import 'package:signalr_core/src/logger.dart';
 import 'package:tuple/tuple.dart';
 
 typedef OnReceive = void Function(dynamic data);
