@@ -1,8 +1,8 @@
 name: sig
 description: An absolute bare-bones web app.
-# version: 1.0.0
-#homepage: https://www.example.com
-#author: Jamie West
+version: 1.0.0
+homepage: https://www.github.com/jamiewest/signalr_core
+author: Jamie West
 
 environment:
   sdk: '>=2.6.0 <3.0.0'
