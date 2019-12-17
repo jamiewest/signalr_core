@@ -14,10 +14,10 @@ class HttpConnectionOptions {
     this.withCredentials = true
   });
 
-  /// An [HttpClient] that will be used to make HTTP requests.
+  /// An [BaseClient] that will be used to make HTTP requests.
   final BaseClient client;
 
-  /// An [HttpTransportType] value specifying the transport to use for the connection.
+  /// An [HttpTransportType] or [Transport] value specifying the transport to use for the connection.
   final dynamic transport;
 
   /// Configures the logger used for logging.
