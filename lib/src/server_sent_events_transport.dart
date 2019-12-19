@@ -14,7 +14,8 @@ class ServerSentEventsTransport implements Transport {
   bool _logMessageContent;
   bool _withCredentials;
   String _url;
-  EventSource _eventSource;
+  SseClient _sseClient;
+
 
   ServerSentEventsTransport({
     BaseClient client, 
@@ -59,17 +60,18 @@ class ServerSentEventsTransport implements Transport {
       return completer.completeError(Exception('The Server-Sent Events transport only supports the \'Text\' transfer format'));
     }
 
-    var eventSource = EventSource();
-    eventSource.connect(url: _url);
-
-    eventSource.onopen = () {
+    var client;
+    try {
+      client = SseClient.connect(Uri.parse(url));
       _log(LogLevel.information, 'SSE connected to ${_url}');
       opened = true;
-      _eventSource = eventSource;
+      _sseClient = client;
       completer.complete();
-    };
+    } catch (e) {
+      return completer.completeError(e);
+    }
 
-    eventSource.stream.listen((data) {
+    _sseClient.stream.listen((data) {
       _log(LogLevel.trace, '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
       onreceive(data);
     }, onError: (e) {
@@ -85,7 +87,7 @@ class ServerSentEventsTransport implements Transport {
 
   @override
   Future<void> send(data) async {
-    if (_eventSource == null) {
+    if (_sseClient == null) {
       return Future.error(Exception('Cannot send until the transport is connected'));
     }
     return sendMessage(_log, 'SSE', _client, _url, _accessTokenFactory, data, _logMessageContent, _withCredentials);
@@ -98,9 +100,8 @@ class ServerSentEventsTransport implements Transport {
   }
 
   void _close({Exception exception}) {
-    if (_eventSource != null) {
-      _eventSource.close();
-      _eventSource = null;
+    if (_sseClient != null) {
+      _sseClient = null;
 
       if (onclose != null) {
         onclose(exception);
