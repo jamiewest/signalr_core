@@ -5,10 +5,7 @@ import 'package:signalr_core/src/text_message_format.dart';
 import 'package:tuple/tuple.dart';
 
 class HandshakeRequestMessage {
-  HandshakeRequestMessage({
-    this.protocol, 
-    this.version
-  });
+  HandshakeRequestMessage({this.protocol, this.version});
 
   final String protocol;
 
@@ -16,10 +13,7 @@ class HandshakeRequestMessage {
 }
 
 class HandshakeResponseMessage {
-  HandshakeResponseMessage({
-    this.error,
-    this.minorVersion
-  });
+  HandshakeResponseMessage({this.error, this.minorVersion});
 
   final String error;
 
@@ -27,18 +21,14 @@ class HandshakeResponseMessage {
 }
 
 extension on HandshakeRequestMessage {
-  Map<String, dynamic> toJson() => {
-    'protocol': this.protocol,
-    'version': this.version
-  };
+  Map<String, dynamic> toJson() =>
+      {'protocol': this.protocol, 'version': this.version};
 }
 
 extension HandshakeResponseMessageExtensions on HandshakeResponseMessage {
   static HandshakeResponseMessage fromJson(Map<String, dynamic> json) {
     return HandshakeResponseMessage(
-      error: json['error'],
-      minorVersion: json['minorVersion']
-    );
+        error: json['error'], minorVersion: json['minorVersion']);
   }
 }
 
@@ -47,7 +37,8 @@ class HandshakeProtocol {
     return TextMessageFormat.write(json.encode(handshakeRequest.toJson()));
   }
 
-  Tuple2<dynamic, HandshakeResponseMessage> parseHandshakeResponse(dynamic data) {
+  Tuple2<dynamic, HandshakeResponseMessage> parseHandshakeResponse(
+      dynamic data) {
     HandshakeResponseMessage _responseMessage;
     String _messageData;
     dynamic _remainingData;
@@ -66,7 +57,6 @@ class HandshakeProtocol {
       _remainingData = (data.length > responseLength)
           ? data.sublist(responseLength, data.length)
           : null;
-
     } else {
       final String textData = data;
       final separatorIndex =
@@ -82,12 +72,12 @@ class HandshakeProtocol {
       _remainingData = (textData.length > responseLength)
           ? textData.substring(responseLength)
           : null;
-
     }
 
     // At this point we should have just the single handshake message
     final messages = TextMessageFormat.parse(_messageData);
-    final response = HandshakeResponseMessageExtensions.fromJson(json.decode(messages[0]));
+    final response =
+        HandshakeResponseMessageExtensions.fromJson(json.decode(messages[0]));
 
     // if (response.type) {
     //   throw new Error("Expected a handshake response from the server.");
@@ -95,6 +85,7 @@ class HandshakeProtocol {
 
     _responseMessage = response;
 
-    return Tuple2<dynamic, HandshakeResponseMessage>(_remainingData, _responseMessage);
+    return Tuple2<dynamic, HandshakeResponseMessage>(
+        _remainingData, _responseMessage);
   }
 }

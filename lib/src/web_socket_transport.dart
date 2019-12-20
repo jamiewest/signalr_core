@@ -9,24 +9,21 @@ class WebSocketTransport implements Transport {
   StreamSubscription<dynamic> _streamSubscription;
   WebSocketChannel _channel;
 
-  WebSocketTransport({
-    this.accessTokenFactory,
-    this.logging,
-    this.logMessageContent
-  });
+  WebSocketTransport(
+      {this.accessTokenFactory, this.logging, this.logMessageContent});
 
   final AccessTokenFactory accessTokenFactory;
 
-  final Logging logging; 
+  final Logging logging;
 
   final bool logMessageContent;
-  
+
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {
     assert(url != null);
     assert(transferFormat != null);
 
-    logging(LogLevel.trace, "(WebSockets transport) Connecting."); 
+    logging(LogLevel.trace, "(WebSockets transport) Connecting.");
 
     if (accessTokenFactory != null) {
       final token = await accessTokenFactory();
@@ -47,7 +44,8 @@ class WebSocketTransport implements Transport {
 
       _streamSubscription = _channel.stream.listen((data) {
         var dataDetail = getDataDetail(data, this.logMessageContent);
-        logging(LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
+        logging(LogLevel.trace,
+            '(WebSockets transport) data received. $dataDetail');
         if (onreceive != null) {
           try {
             onreceive(data);
@@ -60,16 +58,13 @@ class WebSocketTransport implements Transport {
       }, onDone: () {
         if (opened == true) {
           _close(null);
-        } else {
-          
-        }
+        } else {}
       }, cancelOnError: false);
 
       return connectFuture.complete();
     } catch (e) {
       return connectFuture.completeError(e);
     }
-
   }
 
   @override
@@ -78,7 +73,8 @@ class WebSocketTransport implements Transport {
       return Future.error(Exception('WebSocket is not in the OPEN state'));
     }
 
-    logging(LogLevel.trace, '(WebSockets transport) sending data. ${getDataDetail(data, this.logMessageContent)}.');
+    logging(LogLevel.trace,
+        '(WebSockets transport) sending data. ${getDataDetail(data, this.logMessageContent)}.');
     _channel.sink.add(data);
     return Future.value();
   }
@@ -90,7 +86,7 @@ class WebSocketTransport implements Transport {
     return Future.value();
   }
 
-    @override
+  @override
   var onclose;
 
   @override

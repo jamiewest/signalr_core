@@ -30,7 +30,8 @@ class HubConnectionBuilder {
   }
 
   /// Configures the [HubConnection] to automatically attempt to reconnect if the connection is lost.
-   HubConnectionBuilder withAutomaticReconnect([dynamic retryDelaysOrReconnectPolicy]) {
+  HubConnectionBuilder withAutomaticReconnect(
+      [dynamic retryDelaysOrReconnectPolicy]) {
     if (_reconnectPolicy != null) {
       throw Exception('A reconnectPolicy has already been set.');
     }
@@ -38,7 +39,8 @@ class HubConnectionBuilder {
     if (retryDelaysOrReconnectPolicy == null) {
       _reconnectPolicy = DefaultReconnectPolicy();
     } else if (retryDelaysOrReconnectPolicy is List) {
-      _reconnectPolicy = DefaultReconnectPolicy(retryDelays: retryDelaysOrReconnectPolicy);
+      _reconnectPolicy =
+          DefaultReconnectPolicy(retryDelays: retryDelaysOrReconnectPolicy);
     } else if (retryDelaysOrReconnectPolicy is RetryPolicy) {
       _reconnectPolicy = retryDelaysOrReconnectPolicy;
     }
@@ -50,15 +52,18 @@ class HubConnectionBuilder {
   HubConnection build() {
     // Now create the connection
     if (_url == null) {
-      throw Exception('The \'HubConnectionBuilder.withUrl\' method must be called before building the connection.');
+      throw Exception(
+          'The \'HubConnectionBuilder.withUrl\' method must be called before building the connection.');
     }
-    final connection = HttpConnection(url: _url, options: _httpConnectionOptions);
+    final connection =
+        HttpConnection(url: _url, options: _httpConnectionOptions);
 
     return HubConnection(
-      connection: connection,
-      logging: _httpConnectionOptions.logging,
-      protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
-      reconnectPolicy: _reconnectPolicy
-    );
+        connection: connection,
+        logging: (_httpConnectionOptions.logging != null)
+            ? _httpConnectionOptions.logging
+            : (l, m) => {},
+        protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
+        reconnectPolicy: _reconnectPolicy);
   }
 }

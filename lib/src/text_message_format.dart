@@ -1,6 +1,6 @@
 class TextMessageFormat {
   static const RecordSeparatorCode = 0x1e;
-  
+
   static String recordSeparator =
       String.fromCharCode(TextMessageFormat.RecordSeparatorCode);
 

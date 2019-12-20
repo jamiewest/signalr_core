@@ -17,18 +17,22 @@ enum HttpTransportType {
 extension HttpTransportTypeExtensions on HttpTransportType {
   static HttpTransportType fromName(String name) {
     switch (name) {
-      case 'none': {
-        return HttpTransportType.none;
-      }
-      case 'WebSockets': {
-        return HttpTransportType.webSockets;
-      }
-      case 'ServerSentEvents': {
-        return HttpTransportType.serverSentEvents;
-      }
-      case 'LongPolling': {
-        return HttpTransportType.longPolling;
-      }
+      case 'none':
+        {
+          return HttpTransportType.none;
+        }
+      case 'WebSockets':
+        {
+          return HttpTransportType.webSockets;
+        }
+      case 'ServerSentEvents':
+        {
+          return HttpTransportType.serverSentEvents;
+        }
+      case 'LongPolling':
+        {
+          return HttpTransportType.longPolling;
+        }
       default:
         return HttpTransportType.none;
     }
@@ -46,20 +50,22 @@ enum TransferFormat {
 extension TransferFormatExtensions on TransferFormat {
   static TransferFormat fromName(String name) {
     switch (name) {
-      case 'Text': {
-        return TransferFormat.text;
-      }
-      case 'Binary': {
-        return TransferFormat.binary;
-      }
+      case 'Text':
+        {
+          return TransferFormat.text;
+        }
+      case 'Binary':
+        {
+          return TransferFormat.binary;
+        }
       default:
         return TransferFormat.binary;
     }
   }
 }
 
-/// An abstraction over the behavior of transports. 
-/// 
+/// An abstraction over the behavior of transports.
+///
 /// This is designed to support the framework and not intended for use by applications.
 abstract class Transport {
   Future<void> connect(String url, TransferFormat transferFormat);

@@ -15,19 +15,17 @@ class LongPollingTransport implements Transport {
   Future<void> _receiving;
   Exception _closeError;
 
-  LongPollingTransport({
-    BaseClient client, 
-    AccessTokenFactory accessTokenFactory,
-    Logging log,
-    bool logMessageContent,
-    bool withCredentials
-  }) : 
-    _client = client,
-    _accessTokenFactory = accessTokenFactory,
-    _log = log,
-    _logMessageContent = logMessageContent,
-    _withCredentials = withCredentials {
-
+  LongPollingTransport(
+      {BaseClient client,
+      AccessTokenFactory accessTokenFactory,
+      Logging log,
+      bool logMessageContent,
+      bool withCredentials})
+      : _client = client,
+        _accessTokenFactory = accessTokenFactory,
+        _log = log,
+        _logMessageContent = logMessageContent,
+        _withCredentials = withCredentials {
     _running = false;
     onreceive = null;
     onclose = null;
@@ -48,10 +46,10 @@ class LongPollingTransport implements Transport {
     final headers = <String, String>{};
     final userAgentHeader = getUserAgentHeader();
     headers[userAgentHeader.item1] = userAgentHeader.item2;
-  
+
     final token = await _getAccessToken();
     if (token != null) {
-      headers['Authorization']  = 'Bearer ${token}';
+      headers['Authorization'] = 'Bearer ${token}';
     }
 
     // Make initial long polling request
@@ -60,12 +58,12 @@ class LongPollingTransport implements Transport {
     _log(LogLevel.trace, '(LongPolling transport) polling: ${pollUrl}.');
     final response = await _client.get(pollUrl, headers: headers);
     if (response.statusCode != 200) {
-      _log(LogLevel.error, '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
+      _log(LogLevel.error,
+          '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
 
       // Mark running as false so that the poll immediately ends and runs the close logic
       _closeError = Exception(response.statusCode);
       _running = false;
-
     } else {
       _running = true;
     }
@@ -87,22 +85,26 @@ class LongPollingTransport implements Transport {
         // We have to get the access token on each poll, in case it changes
         final token = await _getAccessToken();
         if (token != null) {
-          headers['Authorization']  = 'Bearer ${token}';
+          headers['Authorization'] = 'Bearer ${token}';
         }
 
         final pollUrl = '${url}&_=${DateTime.now().millisecondsSinceEpoch}';
         _log(LogLevel.trace, '(LongPolling transport) polling: ${pollUrl}.');
-        final response = await _client.get(pollUrl, headers: headers).timeout(const Duration(milliseconds: 100000), onTimeout: () {
+        final response = await _client
+            .get(pollUrl, headers: headers)
+            .timeout(const Duration(milliseconds: 100000), onTimeout: () {
           _log(LogLevel.warning, 'Timeout from HTTP request.');
           throw TimeoutException('A timeout occurred.');
         });
 
         if (response.statusCode == 204) {
-          _log(LogLevel.information, '(LongPolling transport) Poll terminated by server.');
+          _log(LogLevel.information,
+              '(LongPolling transport) Poll terminated by server.');
 
           _running = false;
         } else if (response.statusCode != 200) {
-          _log(LogLevel.error, '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
+          _log(LogLevel.error,
+              '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
 
           // Unexpected status code
           _closeError = Exception(response.statusCode);
@@ -110,26 +112,29 @@ class LongPollingTransport implements Transport {
         } else {
           // Process the response
           if (response.body.isNotEmpty) {
-            _log(LogLevel.trace, '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
+            _log(LogLevel.trace,
+                '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
 
             if (onreceive != null) {
               onreceive(response.body);
             }
           } else {
             // This is another way timeout manifest.
-            _log(LogLevel.trace, '(LongPolling transport) Poll timed out, reissuing.');
+            _log(LogLevel.trace,
+                '(LongPolling transport) Poll timed out, reissuing.');
           }
         }
-
       }
     } catch (e) {
       if (!_running) {
         // Log but disregard errors that occur after stopping
-        _log(LogLevel.trace, '(LongPolling transport) Poll errored after shutdown: ${e.message}');
+        _log(LogLevel.trace,
+            '(LongPolling transport) Poll errored after shutdown: ${e.message}');
       } else {
         if (e is TimeoutException) {
           // Ignore timeouts and reissue the poll.
-          _log(LogLevel.trace, '(LongPolling transport) Poll timed out, reissuing.');
+          _log(LogLevel.trace,
+              '(LongPolling transport) Poll timed out, reissuing.');
         } else {
           // Close the connection with the error as the result.
           _closeError = e;
@@ -150,9 +155,11 @@ class LongPollingTransport implements Transport {
   @override
   Future<void> send(data) async {
     if (!_running) {
-      return Future.error(Exception('Cannot send until the transport is connected'));
+      return Future.error(
+          Exception('Cannot send until the transport is connected'));
     }
-    return sendMessage(_log, 'LongPolling', _client, _url, _accessTokenFactory, data, _logMessageContent, _withCredentials);
+    return sendMessage(_log, 'LongPolling', _client, _url, _accessTokenFactory,
+        data, _logMessageContent, _withCredentials);
   }
 
   @override
@@ -167,15 +174,16 @@ class LongPollingTransport implements Transport {
       await _receiving;
 
       // Send DELETE to clean up long polling on the server
-      _log(LogLevel.trace, '(LongPolling transport) sending DELETE request to ${_url}.');
+      _log(LogLevel.trace,
+          '(LongPolling transport) sending DELETE request to ${_url}.');
 
       final headers = <String, String>{};
       final userAgentHeader = getUserAgentHeader();
       headers[userAgentHeader.item1] = userAgentHeader.item2;
-    
+
       final token = await _getAccessToken();
       if (token != null) {
-        headers['Authorization']  = 'Bearer ${token}';
+        headers['Authorization'] = 'Bearer ${token}';
       }
 
       await _client.delete(_url, headers: headers);
@@ -191,7 +199,7 @@ class LongPollingTransport implements Transport {
   }
 
   void _raiseOnClose() {
-    if (onclose !=null) {
+    if (onclose != null) {
       var logMessage = '(LongPolling transport) Firing onclose event.';
       if (_closeError != null) {
         logMessage += ' Error: ' + _closeError.toString();

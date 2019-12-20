@@ -65,7 +65,11 @@ class JsonHubProtocol implements HubProtocol {
           break;
         default:
           // Future protocol changes can add message types, old clients can ignore them
-          logging(LogLevel.information, 'Unknown message type \'' + parsedMessage.type.toString() + '\' ignored.');
+          logging(
+              LogLevel.information,
+              'Unknown message type \'' +
+                  parsedMessage.type.toString() +
+                  '\' ignored.');
           continue;
       }
       hubMessages.add(parsedMessage);
@@ -81,25 +85,32 @@ class JsonHubProtocol implements HubProtocol {
       case MessageType.undefined:
         break;
       case MessageType.invocation:
-        return TextMessageFormat.write(json.encode((message as InvocationMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as InvocationMessage).toJson()));
         break;
       case MessageType.streamItem:
-        return TextMessageFormat.write(json.encode((message as StreamItemMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as StreamItemMessage).toJson()));
         break;
       case MessageType.completion:
-        return TextMessageFormat.write(json.encode((message as CompletionMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as CompletionMessage).toJson()));
         break;
       case MessageType.streamInvocation:
-        return TextMessageFormat.write(json.encode((message as StreamInvocationMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as StreamInvocationMessage).toJson()));
         break;
       case MessageType.cancelInvocation:
-        return TextMessageFormat.write(json.encode((message as CancelInvocationMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as CancelInvocationMessage).toJson()));
         break;
       case MessageType.ping:
-        return TextMessageFormat.write(json.encode((message as PingMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as PingMessage).toJson()));
         break;
       case MessageType.close:
-        return TextMessageFormat.write(json.encode((message as CloseMessage).toJson()));
+        return TextMessageFormat.write(
+            json.encode((message as CloseMessage).toJson()));
         break;
       default:
         break;
@@ -109,7 +120,7 @@ class JsonHubProtocol implements HubProtocol {
 
   static MessageType _getMessageTypeFromJson(Map<String, dynamic> json) {
     switch (json['type']) {
-      case 0: 
+      case 0:
         return MessageType.undefined;
       case 1:
         return MessageType.invocation;
@@ -121,25 +132,28 @@ class JsonHubProtocol implements HubProtocol {
         return MessageType.streamInvocation;
       case 5:
         return MessageType.cancelInvocation;
-      case 6:  
+      case 6:
         return MessageType.ping;
       case 7:
         return MessageType.close;
       default:
-       return MessageType.undefined;
+        return MessageType.undefined;
     }
   }
 
   void _isInvocationMessage(InvocationMessage message) {
-    _assertNotEmptyString(message.target, 'Invalid payload for Invocation message.');
+    _assertNotEmptyString(
+        message.target, 'Invalid payload for Invocation message.');
 
     if (message.invocationId != null) {
-      _assertNotEmptyString(message.target, 'Invalid payload for Invocation message.');
+      _assertNotEmptyString(
+          message.target, 'Invalid payload for Invocation message.');
     }
   }
 
   void _isStreamItemMessage(StreamItemMessage message) {
-    _assertNotEmptyString(message.invocationId, 'Invalid payload for StreamItem message.');
+    _assertNotEmptyString(
+        message.invocationId, 'Invalid payload for StreamItem message.');
 
     if (message.item == null) {
       throw Exception('Invalid payload for StreamItem message.');
@@ -152,10 +166,12 @@ class JsonHubProtocol implements HubProtocol {
     }
 
     if ((message.result == null) && (message.error != null)) {
-      _assertNotEmptyString(message.error, 'Invalid payload for Completion message.');
+      _assertNotEmptyString(
+          message.error, 'Invalid payload for Completion message.');
     }
 
-    _assertNotEmptyString(message.invocationId, 'Invalid payload for Completion message.');
+    _assertNotEmptyString(
+        message.invocationId, 'Invalid payload for Completion message.');
   }
 
   void _assertNotEmptyString(dynamic value, String errorMessage) {
@@ -168,19 +184,19 @@ class JsonHubProtocol implements HubProtocol {
 extension InvocationMessageExtensions on InvocationMessage {
   static InvocationMessage fromJson(Map<String, dynamic> json) {
     return InvocationMessage(
-      target: json['target'],
-      arguments: (json['arguments'] as List)?.map((item) => item as Object)?.toList(),
-      headers: json['headers'],
-      invocationId: json['invocationId'],
-      streamIds: json['streamIds']
-    );
+        target: json['target'],
+        arguments: (json['arguments'] as List)
+            ?.map((item) => item as Object)
+            ?.toList(),
+        headers: json['headers'],
+        invocationId: json['invocationId'],
+        streamIds: json['streamIds']);
   }
 
   Map<String, dynamic> toJson() {
     return {
       'type': this.type.value,
-      if (this.invocationId != null) 
-        'invocationId': this.invocationId,
+      if (this.invocationId != null) 'invocationId': this.invocationId,
       'target': this.target,
       'arguments': this.arguments,
       'streamIds': this.streamIds
@@ -203,10 +219,9 @@ extension StreamInvocationMessageExtensions on StreamInvocationMessage {
 extension StreamItemMessageExtensions on StreamItemMessage {
   static StreamItemMessage fromJson(Map<String, dynamic> json) {
     return StreamItemMessage(
-      item: json['item'],
-      headers: json['headers'],
-      invocationId: json['invocationId']
-    );
+        item: json['item'],
+        headers: json['headers'],
+        invocationId: json['invocationId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -230,11 +245,10 @@ extension CancelInvocationMessageExtensions on CancelInvocationMessage {
 extension CompletionMessageExtensions on CompletionMessage {
   static CompletionMessage fromJson(Map<String, dynamic> json) {
     return CompletionMessage(
-      result: json['result'],
-      error: json['error'],
-      headers: json['headers'],
-      invocationId: json['invocationId']
-    );
+        result: json['result'],
+        error: json['error'],
+        headers: json['headers'],
+        invocationId: json['invocationId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -249,27 +263,20 @@ extension CompletionMessageExtensions on CompletionMessage {
 
 extension PingMessageExtensions on PingMessage {
   static PingMessage fromJson(Map<String, dynamic> json) {
-    return PingMessage( );
+    return PingMessage();
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': this.type.value
-    };
+    return {'type': this.type.value};
   }
 }
 
 extension CloseMessageExtensions on CloseMessage {
   static CloseMessage fromJson(Map<String, dynamic> json) {
-    return CloseMessage(
-      error: json['error']
-    );
+    return CloseMessage(error: json['error']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': this.type.value,
-      'error': this.error
-    };
+    return {'type': this.type.value, 'error': this.error};
   }
 }

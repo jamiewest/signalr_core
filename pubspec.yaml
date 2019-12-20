@@ -1,6 +1,6 @@
 name: signalr_core
 description: ASP.NET Core SignalR Client.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/jamiewest/signalr_core
 author: Jamie West
 

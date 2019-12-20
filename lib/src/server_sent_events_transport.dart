@@ -16,19 +16,17 @@ class ServerSentEventsTransport implements Transport {
   String _url;
   SseClient _sseClient;
 
-
-  ServerSentEventsTransport({
-    BaseClient client, 
-    AccessTokenFactory accessTokenFactory, 
-    Logging logging,
-    bool logMessageContent, 
-    bool withCredentials
-  }) : 
-    _client = client, 
-    _accessTokenFactory = accessTokenFactory,
-    _log = logging,
-    _logMessageContent = logMessageContent,
-    _withCredentials = withCredentials {
+  ServerSentEventsTransport(
+      {BaseClient client,
+      AccessTokenFactory accessTokenFactory,
+      Logging logging,
+      bool logMessageContent,
+      bool withCredentials})
+      : _client = client,
+        _accessTokenFactory = accessTokenFactory,
+        _log = logging,
+        _logMessageContent = logMessageContent,
+        _withCredentials = withCredentials {
     onclose = null;
     onreceive = null;
   }
@@ -49,7 +47,8 @@ class ServerSentEventsTransport implements Transport {
     if (_accessTokenFactory != null) {
       final token = await _accessTokenFactory();
       if (token != null) {
-        _url += (!url.contains('?') ? '?' : '&') + 'access_token=${Uri.encodeComponent(token)}';
+        _url += (!url.contains('?') ? '?' : '&') +
+            'access_token=${Uri.encodeComponent(token)}';
       }
     }
 
@@ -57,7 +56,8 @@ class ServerSentEventsTransport implements Transport {
 
     var opened = false;
     if (transferFormat != TransferFormat.text) {
-      return completer.completeError(Exception('The Server-Sent Events transport only supports the \'Text\' transfer format'));
+      return completer.completeError(Exception(
+          'The Server-Sent Events transport only supports the \'Text\' transfer format'));
     }
 
     var client;
@@ -72,7 +72,8 @@ class ServerSentEventsTransport implements Transport {
     }
 
     _sseClient.stream.listen((data) {
-      _log(LogLevel.trace, '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
+      _log(LogLevel.trace,
+          '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
       onreceive(data);
     }, onError: (e) {
       if (opened) {
@@ -88,9 +89,11 @@ class ServerSentEventsTransport implements Transport {
   @override
   Future<void> send(data) async {
     if (_sseClient == null) {
-      return Future.error(Exception('Cannot send until the transport is connected'));
+      return Future.error(
+          Exception('Cannot send until the transport is connected'));
     }
-    return sendMessage(_log, 'SSE', _client, _url, _accessTokenFactory, data, _logMessageContent, _withCredentials);
+    return sendMessage(_log, 'SSE', _client, _url, _accessTokenFactory, data,
+        _logMessageContent, _withCredentials);
   }
 
   @override
@@ -109,21 +112,3 @@ class ServerSentEventsTransport implements Transport {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

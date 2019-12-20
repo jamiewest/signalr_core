@@ -7,18 +7,15 @@ abstract class RetryPolicy {
 }
 
 class RetryContext {
-  const RetryContext({
-    this.previousRetryCount, 
-    this.elapsedMilliseconds, 
-    this.retryReason
-  });
+  const RetryContext(
+      {this.previousRetryCount, this.elapsedMilliseconds, this.retryReason});
 
   /// The number of consecutive failed tries so far.
   final int previousRetryCount;
-  
+
   /// The amount of time in milliseconds spent retrying so far.
   final int elapsedMilliseconds;
-  
+
   /// The error that forced the upcoming retry.
   final Exception retryReason;
 }

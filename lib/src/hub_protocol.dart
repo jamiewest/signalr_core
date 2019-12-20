@@ -24,7 +24,7 @@ enum MessageType {
 extension MessageTypeExtensions on MessageType {
   int get value {
     switch (this) {
-      case MessageType.undefined: 
+      case MessageType.undefined:
         return 0;
       case MessageType.invocation:
         return 1;
@@ -36,18 +36,18 @@ extension MessageTypeExtensions on MessageType {
         return 4;
       case MessageType.cancelInvocation:
         return 5;
-      case MessageType.ping:  
+      case MessageType.ping:
         return 6;
       case MessageType.close:
         return 7;
       default:
-       return 0;
+        return 0;
     }
   }
 
   String get name {
     switch (this) {
-      case MessageType.undefined: 
+      case MessageType.undefined:
         return '0';
       case MessageType.invocation:
         return 'invocation';
@@ -59,12 +59,12 @@ extension MessageTypeExtensions on MessageType {
         return 'streamInvocation';
       case MessageType.cancelInvocation:
         return 'cancelInvocation';
-      case MessageType.ping:  
+      case MessageType.ping:
         return 'ping';
       case MessageType.close:
         return 'close';
       default:
-       return '';
+        return '';
     }
   }
 }
@@ -79,11 +79,8 @@ abstract class HubMessage {
 
 /// Defines properties common to all Hub messages relating to a specific invocation.
 abstract class HubInvocationMessage extends HubMessage {
-   HubInvocationMessage({
-    MessageType type,
-    this.headers,
-    this.invocationId
-  }) : super(type: type);
+  HubInvocationMessage({MessageType type, this.headers, this.invocationId})
+      : super(type: type);
 
   /// A [MessageHeaders] dictionary containing headers attached to the message.
   final Map<String, String> headers;
@@ -97,18 +94,16 @@ abstract class HubInvocationMessage extends HubMessage {
 
 /// A hub message representing a non-streaming invocation.
 class InvocationMessage extends HubInvocationMessage {
-  InvocationMessage({
-    this.target, 
-    this.arguments,
-    this.streamIds,
-    Map<String, String> headers, 
-    String invocationId
-  }) : 
-    super(
-      type: MessageType.invocation, 
-      headers: headers, 
-      invocationId: invocationId
-    );
+  InvocationMessage(
+      {this.target,
+      this.arguments,
+      this.streamIds,
+      Map<String, String> headers,
+      String invocationId})
+      : super(
+            type: MessageType.invocation,
+            headers: headers,
+            invocationId: invocationId);
 
   /// The target method name.
   final String target;
@@ -122,18 +117,16 @@ class InvocationMessage extends HubInvocationMessage {
 
 /// A hub message representing a streaming invocation.
 class StreamInvocationMessage extends HubInvocationMessage {
-  StreamInvocationMessage({
-    this.target, 
-    this.arguments,
-    this.streamIds,
-    Map<String, String> headers, 
-    String invocationId
-  }) : 
-    super(
-      type: MessageType.streamInvocation, 
-      headers: headers, 
-      invocationId: invocationId
-    );
+  StreamInvocationMessage(
+      {this.target,
+      this.arguments,
+      this.streamIds,
+      Map<String, String> headers,
+      String invocationId})
+      : super(
+            type: MessageType.streamInvocation,
+            headers: headers,
+            invocationId: invocationId);
 
   /// The target method name.
   final String target;
@@ -147,16 +140,12 @@ class StreamInvocationMessage extends HubInvocationMessage {
 
 /// A hub message representing a single item produced as part of a result stream.
 class StreamItemMessage extends HubInvocationMessage {
-  StreamItemMessage({
-    this.item, 
-    Map<String, String> headers, 
-    String invocationId
-  }) : 
-    super(
-      type: MessageType.streamItem, 
-      headers: headers, 
-      invocationId: invocationId
-    );
+  StreamItemMessage(
+      {this.item, Map<String, String> headers, String invocationId})
+      : super(
+            type: MessageType.streamItem,
+            headers: headers,
+            invocationId: invocationId);
 
   /// The item produced by the server.
   final dynamic item;
@@ -164,17 +153,15 @@ class StreamItemMessage extends HubInvocationMessage {
 
 /// A hub message representing the result of an invocation.
 class CompletionMessage extends HubInvocationMessage {
-  CompletionMessage({
-    this.error, 
-    this.result, 
-    Map<String, String> headers, 
-    String invocationId
-  }) : 
-    super(
-      type: MessageType.completion, 
-      headers: headers, 
-      invocationId: invocationId
-    );
+  CompletionMessage(
+      {this.error,
+      this.result,
+      Map<String, String> headers,
+      String invocationId})
+      : super(
+            type: MessageType.completion,
+            headers: headers,
+            invocationId: invocationId);
 
   /// The error produced by the invocation, if any.
   ///
@@ -197,10 +184,8 @@ class PingMessage extends HubMessage {
 /// If {@link @aspnet/signalr.CloseMessage.error} is defined, the sender is closing the connection due to an error.
 ///
 class CloseMessage extends HubMessage {
-  CloseMessage({
-    this.error,
-    this.allowReconnect
-  }) : super(type: MessageType.close);
+  CloseMessage({this.error, this.allowReconnect})
+      : super(type: MessageType.close);
 
   /// The error that triggered the close, if any.
   ///
@@ -214,23 +199,16 @@ class CloseMessage extends HubMessage {
 
 /// A hub message sent to request that a streaming invocation be canceled.
 class CancelInvocationMessage extends HubInvocationMessage {
-  CancelInvocationMessage({
-    Map<String, String> headers, 
-    String invocationId
-  }) : super(
-    type: MessageType.cancelInvocation, 
-    headers: headers, 
-    invocationId: invocationId
-  );
+  CancelInvocationMessage({Map<String, String> headers, String invocationId})
+      : super(
+            type: MessageType.cancelInvocation,
+            headers: headers,
+            invocationId: invocationId);
 }
 
 /// A protocol abstraction for communicating with SignalR Hubs.
 abstract class HubProtocol {
-  HubProtocol({
-    this.name, 
-    this.version, 
-    this.transferFormat
-  });
+  HubProtocol({this.name, this.version, this.transferFormat});
 
   /// The name of the protocol. This is used by SignalR to resolve the protocol between the client and server.
   final String name;
