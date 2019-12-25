@@ -29,7 +29,7 @@ class WebSocketTransport implements Transport {
       final token = await accessTokenFactory();
       if (token.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
-        url += (url.contains('?') ? '?' : '&') + "access_token=$encodedToken";
+        url += (url.contains('?') ? '&' : '?') + "access_token=$encodedToken";
       }
     }
 
