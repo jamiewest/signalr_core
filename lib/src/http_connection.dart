@@ -640,7 +640,10 @@ class TransportSendQueue {
     }
 
     _buffer.add(data);
-    _sendBufferedData.complete();
+    
+    if(!_sendBufferedData.isCompleted) {
+      _sendBufferedData.complete();
+    }
   }
 
   Future<void> sendLoop() async {
