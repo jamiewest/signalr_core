@@ -1,3 +1,6 @@
+
+import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:signalr_core/signalr_core.dart';
 
 /// A builder for configuring [HubConnection] instances.
@@ -6,7 +9,7 @@ class HubConnectionBuilder {
   HttpConnectionOptions _httpConnectionOptions;
   HttpTransportType _httpTransportType;
   String _url;
-  RetryPolicy _reconnectPolicy;
+  RetryPolicy reconnectPolicy;
 
   /// Configures the [HubConnection] to use HTTP-based transports to connect to the specified URL.
   HubConnectionBuilder withUrl(String url, [dynamic transportTypeOrOptions]) {
@@ -32,17 +35,17 @@ class HubConnectionBuilder {
   /// Configures the [HubConnection] to automatically attempt to reconnect if the connection is lost.
   HubConnectionBuilder withAutomaticReconnect(
       [dynamic retryDelaysOrReconnectPolicy]) {
-    if (_reconnectPolicy != null) {
+    if (reconnectPolicy != null) {
       throw Exception('A reconnectPolicy has already been set.');
     }
 
     if (retryDelaysOrReconnectPolicy == null) {
-      _reconnectPolicy = DefaultReconnectPolicy();
+      reconnectPolicy = DefaultReconnectPolicy();
     } else if (retryDelaysOrReconnectPolicy is List) {
-      _reconnectPolicy =
+      reconnectPolicy =
           DefaultReconnectPolicy(retryDelays: retryDelaysOrReconnectPolicy);
     } else if (retryDelaysOrReconnectPolicy is RetryPolicy) {
-      _reconnectPolicy = retryDelaysOrReconnectPolicy;
+      reconnectPolicy = retryDelaysOrReconnectPolicy;
     }
 
     return this;
@@ -55,6 +58,11 @@ class HubConnectionBuilder {
       throw Exception(
           'The \'HubConnectionBuilder.withUrl\' method must be called before building the connection.');
     }
+
+    if (_httpConnectionOptions == null) {
+      _httpConnectionOptions = HttpConnectionOptions(transport: _httpTransportType);
+    }
+
     final connection =
         HttpConnection(url: _url, options: _httpConnectionOptions);
 
@@ -64,6 +72,6 @@ class HubConnectionBuilder {
             ? _httpConnectionOptions.logging
             : (l, m) => {},
         protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
-        reconnectPolicy: _reconnectPolicy);
+        reconnectPolicy: reconnectPolicy);
   }
 }

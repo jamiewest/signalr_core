@@ -6,12 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:signalr_core/src/connection.dart';
 import 'package:signalr_core/src/http_connection_options.dart';
 import 'package:signalr_core/src/logger.dart';
-import 'package:signalr_core/src/long_polling_transport.dart';
-import 'package:signalr_core/src/server_sent_events_transport.dart';
+import 'package:signalr_core/src/transports/long_polling_transport.dart';
+import 'package:signalr_core/src/transports/server_sent_events_transport.dart';
+import 'package:signalr_core/src/transports/web_socket_transport.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:meta/meta.dart';
 import 'package:signalr_core/src/utils.dart';
-import 'package:signalr_core/src/web_socket_transport.dart';
 
 enum ConnectionState { connecting, connected, disconnected, disconnecting }
 
@@ -117,12 +117,9 @@ class HttpConnection implements Connection {
   final int negotiateVersion = 1;
 
   HttpConnection(
-      {@required String url,
-      http.BaseClient client,
-      HttpConnectionOptions options,
-      Logging log})
+      {@required String url, HttpConnectionOptions options, Logging log})
       : baseUrl = url,
-        _client = (client != null) ? client : http.Client(),
+        _client = (options.client != null) ? options.client : http.Client(),
         _options = options {
     _logging = (options.logging != null) ? options.logging : (l, m) => {};
     _connectionState = ConnectionState.disconnected;
@@ -217,15 +214,15 @@ class HttpConnection implements Connection {
       // This exception is returned to the user as a rejected Future from the start method.
     }
 
-    if (_sendQueue != null) {
-      try {
-        await _sendQueue.stop();
-      } catch (e) {
-        _logging(LogLevel.error,
-            'TransportSendQueue.stop() threw error \'${e.toString()}\'.');
-      }
-      _sendQueue = null;
-    }
+    // if (_sendQueue != null) {
+    //   try {
+    //     await _sendQueue.stop();
+    //   } catch (e) {
+    //     _logging(LogLevel.error,
+    //         'TransportSendQueue.stop() threw error \'${e.toString()}\'.');
+    //   }
+    //   _sendQueue = null;
+    // }
 
     // The transport's onclose will trigger stopConnection which will run our onclose event.
     // The transport should always be set if currently connected. If it wasn't set, it's likely because
@@ -276,24 +273,31 @@ class HttpConnection implements Connection {
       _stopCompleter.complete();
     }
 
-    if (exception != null) {
+    if (_exception != null) {
       _logging(LogLevel.error,
           'Connection disconnected with error \'${_exception.toString()}\'.');
     } else {
       _logging(LogLevel.information, 'Connection disconnected.');
     }
 
+    if (_sendQueue != null) {
+      _sendQueue.stop().catchError((e) => _logging(LogLevel.error,
+          'TransportSendQueue.stop() threw error \'${e.toString()}\'.'));
+      _sendQueue = null;
+    }
+
     connectionId = null;
     _connectionState = ConnectionState.disconnected;
 
-    if (onclose != null && _connectionStarted) {
+    if (_connectionStarted) {
       _connectionStarted = false;
-
       try {
-        onclose(exception);
+        if (onclose != null) {
+          onclose(_exception);
+        }
       } catch (e) {
         _logging(LogLevel.error,
-            'HttpConnection.onclose(${_exception.toString()}) threw error \'${e}\'.');
+            'HttpConnection.onclose(${_exception.toString()}) threw error \'${e.toString()}\'.');
       }
     }
   }
@@ -576,7 +580,8 @@ class HttpConnection implements Connection {
         return WebSocketTransport(
             accessTokenFactory: _accessTokenFactory,
             logging: _logging,
-            logMessageContent: _options.logMessageContent);
+            logMessageContent: _options.logMessageContent,
+            client: _client);
         break;
       case HttpTransportType.serverSentEvents:
         return ServerSentEventsTransport(

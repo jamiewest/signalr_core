@@ -80,7 +80,7 @@ class HubConnection {
 
     _handshakeProtocol = HandshakeProtocol();
     _connection.onreceive = (dynamic data) => _processIncomingData(data);
-    _connection.onclose = (Exception exception) => _connectionClosed();
+    _connection.onclose = (Exception exception) => _connectionClosed(exception: exception);
 
     _callbacks = {};
     _methods = {};
@@ -228,7 +228,7 @@ class HubConnection {
       // Awaiting undefined continues immediately
       await startFuture;
     } catch (e) {
-      // This exception is returned to the user as a rejected Promise from the start method.
+      // This exception is returned to the user as a rejected Future from the start method.
     }
   }
 
@@ -330,7 +330,10 @@ class HubConnection {
       // Set the timeout timer
       _timeoutHandle = Timer.periodic(
           Duration(milliseconds: serverTimeoutInMilliseconds),
-          (Timer timer) => _serverTimeout);
+          (Timer timer) {
+            _serverTimeout();
+            timer.cancel();
+          });
     }
   }
 
@@ -352,7 +355,7 @@ class HubConnection {
         _closedCallbacks.forEach((c) => c(exception));
       } catch (e) {
         _logger(LogLevel.error,
-            'An onclose callback called with error \'${exception}\' threw error \'${e}\'.');
+            'An onclose callback called with error \'${exception.toString()}\' threw error \'${e.toString()}\'.');
       }
     }
   }
@@ -464,11 +467,10 @@ class HubConnection {
       int elapsedMilliseconds,
       Exception retryReason}) {
     try {
-      return _reconnectPolicy.nextRetryDelayInMilliseconds(
-          retryContext: RetryContext(
-              elapsedMilliseconds: elapsedMilliseconds,
-              previousRetryCount: previousRetryCount,
-              retryReason: retryReason));
+      return _reconnectPolicy.nextRetryDelayInMilliseconds(RetryContext(
+          elapsedMilliseconds: elapsedMilliseconds,
+          previousRetryCount: previousRetryCount,
+          retryReason: retryReason));
     } catch (e) {
       _logger(LogLevel.error,
           'RetryPolicy.nextRetryDelayInMilliseconds(${previousRetryCount}, ${elapsedMilliseconds}) threw error \'${e.toString()}\'.');
@@ -710,6 +712,8 @@ class HubConnection {
         }
       }
     }
+
+    _resetTimeoutPeriod();
   }
 
   dynamic _processHandshakeResponse(dynamic data) {
@@ -772,6 +776,7 @@ class HubConnection {
     _cleanupPingTimer();
 
     if (_connectionState == HubConnectionState.disconnecting) {
+      _completeClose(exception: exception);
     } else if ((_connectionState == HubConnectionState.connected) &&
         _reconnectPolicy != null) {
       _reconnect(exception: exception);
@@ -801,20 +806,28 @@ class HubConnection {
       bool nonblocking,
       List<String> streamIds}) {
     if (nonblocking) {
-      return InvocationMessage(
-        arguments: args,
-        streamIds: streamIds,
-        target: methodName,
-      );
+      if (streamIds.isNotEmpty) {
+        return InvocationMessage(
+            arguments: args, streamIds: streamIds, target: methodName);
+      } else {
+        return InvocationMessage(arguments: args, target: methodName);
+      }
     } else {
       final invocationId = _invocationId;
       _invocationId++;
 
-      return InvocationMessage(
-          arguments: args,
-          invocationId: invocationId.toString(),
-          streamIds: streamIds,
-          target: methodName);
+      if (streamIds.isNotEmpty) {
+        return InvocationMessage(
+            arguments: args,
+            invocationId: invocationId.toString(),
+            streamIds: streamIds,
+            target: methodName);
+      } else {
+        return InvocationMessage(
+            arguments: args,
+            invocationId: invocationId.toString(),
+            target: methodName);
+      }
     }
   }
 
@@ -823,11 +836,18 @@ class HubConnection {
     final invocationId = _invocationId;
     _invocationId++;
 
-    return StreamInvocationMessage(
-        arguments: args,
-        invocationId: invocationId.toString(),
-        streamIds: streamIds,
-        target: methodName);
+    if (streamIds.isNotEmpty) {
+      return StreamInvocationMessage(
+          arguments: args,
+          invocationId: invocationId.toString(),
+          streamIds: streamIds,
+          target: methodName);
+    } else {
+      return StreamInvocationMessage(
+          arguments: args,
+          invocationId: invocationId.toString(),
+          target: methodName);
+    }
   }
 
   CancelInvocationMessage _createCancelInvocation({String id}) {

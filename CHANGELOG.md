@@ -5,3 +5,7 @@
 ## 1.0.1
 
 - Formatting and other updates.
+
+## 1.0.2 
+
+- Bug fix.

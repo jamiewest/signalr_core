@@ -8,7 +8,7 @@ class DefaultReconnectPolicy implements RetryPolicy {
   final List<int> retryDelays;
 
   @override
-  int nextRetryDelayInMilliseconds({RetryContext retryContext}) {
+  int nextRetryDelayInMilliseconds(RetryContext retryContext) {
     return retryDelays[retryContext.previousRetryCount];
   }
 }

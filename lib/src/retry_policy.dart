@@ -1,9 +1,7 @@
-import 'package:meta/meta.dart';
-
 /// An abstraction that controls when the client attempts to reconnect and how many attempts to do so.
 abstract class RetryPolicy {
   /// Called after the transport loses the connection.
-  int nextRetryDelayInMilliseconds({@required RetryContext retryContext});
+  int nextRetryDelayInMilliseconds(RetryContext retryContext);
 }
 
 class RetryContext {

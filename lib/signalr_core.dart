@@ -18,4 +18,3 @@ export 'src/retry_policy.dart';
 export 'src/text_message_format.dart';
 export 'src/transport.dart';
 export 'src/utils.dart';
-export 'src/web_socket_transport.dart';
