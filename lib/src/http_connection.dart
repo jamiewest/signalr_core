@@ -640,8 +640,8 @@ class TransportSendQueue {
     }
 
     _buffer.add(data);
-    
-    if(!_sendBufferedData.isCompleted) {
+
+    if (!_sendBufferedData.isCompleted) {
       _sendBufferedData.complete();
     }
   }

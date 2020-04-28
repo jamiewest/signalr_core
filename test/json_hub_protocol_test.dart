@@ -6,9 +6,8 @@ import 'package:test/test.dart';
 void main() {
   test('can read ping message', () {
     final payload = '{"type":6}${TextMessageFormat.recordSeparator}';
-    final messages = JsonHubProtocol().parseMessages(payload, (level, message) => print(message));
-    expect(messages, equals([
-      PingMessage()
-    ]));
+    final messages = JsonHubProtocol()
+        .parseMessages(payload, (level, message) => print(message));
+    expect(messages, equals([PingMessage()]));
   });
 }

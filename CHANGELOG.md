@@ -9,3 +9,7 @@
 ## 1.0.2 
 
 - Bug fix.
+
+## 1.0.3 
+
+- Fixed web socket implementation. Other bugs.

@@ -22,17 +22,16 @@ class WebSocketTransport implements Transport {
 
   StreamSubscription<dynamic> _streamSubscription;
   WebSocketChannel _channel;
-  
-  WebSocketTransport(
-      {BaseClient client,
-      AccessTokenFactory accessTokenFactory,
-      Logging logging,
-      bool logMessageContent,
-      }) : 
-      _logging = logging,
-      _accessTokenFactory = accessTokenFactory,
-      _logMessageContent = logMessageContent,
-      _client = client {
+
+  WebSocketTransport({
+    BaseClient client,
+    AccessTokenFactory accessTokenFactory,
+    Logging logging,
+    bool logMessageContent,
+  })  : _logging = logging,
+        _accessTokenFactory = accessTokenFactory,
+        _logMessageContent = logMessageContent,
+        _client = client {
     onreceive = null;
     onreceive = null;
   }
@@ -133,7 +132,8 @@ class WebSocketTransport implements Transport {
         onclose(error);
       } else {
         if (closeCode != 0 && closeCode != 1000) {
-          onclose(Exception('WebSocket closed with status code: $closeCode ($closeReason).'));
+          onclose(Exception(
+              'WebSocket closed with status code: $closeCode ($closeReason).'));
         }
         onclose(null);
       }

@@ -80,7 +80,8 @@ class HubConnection {
 
     _handshakeProtocol = HandshakeProtocol();
     _connection.onreceive = (dynamic data) => _processIncomingData(data);
-    _connection.onclose = (Exception exception) => _connectionClosed(exception: exception);
+    _connection.onclose =
+        (Exception exception) => _connectionClosed(exception: exception);
 
     _callbacks = {};
     _methods = {};
@@ -329,11 +330,10 @@ class HubConnection {
         (!_connection.features.inherentKeepAlive)) {
       // Set the timeout timer
       _timeoutHandle = Timer.periodic(
-          Duration(milliseconds: serverTimeoutInMilliseconds),
-          (Timer timer) {
-            _serverTimeout();
-            timer.cancel();
-          });
+          Duration(milliseconds: serverTimeoutInMilliseconds), (Timer timer) {
+        _serverTimeout();
+        timer.cancel();
+      });
     }
   }
 

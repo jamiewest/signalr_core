@@ -1,4 +1,3 @@
-
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:signalr_core/signalr_core.dart';
@@ -60,7 +59,8 @@ class HubConnectionBuilder {
     }
 
     if (_httpConnectionOptions == null) {
-      _httpConnectionOptions = HttpConnectionOptions(transport: _httpTransportType);
+      _httpConnectionOptions =
+          HttpConnectionOptions(transport: _httpTransportType);
     }
 
     final connection =
