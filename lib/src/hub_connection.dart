@@ -586,17 +586,19 @@ class HubConnection {
     final Map<int, Stream<dynamic>> streams = {};
     final List<String> streamIds = [];
 
-    for (var i = 0; i < args.length; i++) {
-      final argument = args[i];
-      if (argument is Stream) {
-        final streamId = _invocationId;
-        _invocationId++;
-        // Store the stream for later use
-        streams[streamId] = argument;
-        streamIds.add(streamId.toString());
+    if (args != null) {
+      for (var i = 0; i < args.length; i++) {
+        final argument = args[i];
+        if (argument is Stream) {
+          final streamId = _invocationId;
+          _invocationId++;
+          // Store the stream for later use
+          streams[streamId] = argument;
+          streamIds.add(streamId.toString());
 
-        // remove stream from args
-        args.removeAt(i);
+          // remove stream from args
+          args.removeAt(i);
+        }
       }
     }
 

@@ -198,8 +198,8 @@ extension InvocationMessageExtensions on InvocationMessage {
       'type': this.type.value,
       if (this.invocationId != null) 'invocationId': this.invocationId,
       'target': this.target,
-      'arguments': this.arguments,
-      'streamIds': this.streamIds
+      'arguments': this.arguments ?? [],
+      if (this.streamIds != null) 'streamIds': this.streamIds
     };
   }
 }
