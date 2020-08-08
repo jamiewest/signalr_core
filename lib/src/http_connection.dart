@@ -61,7 +61,7 @@ extension NegotiateResponseExtensions on NegotiateResponse {
         availableTransports: AvailableTransportExtensions.listFromJson(
             json['availableTransports']),
         url: json['url'],
-        accessToken: json['accessToekn'],
+        accessToken: json['accessToken'],
         error: json['error']);
   }
 }
