@@ -16,6 +16,10 @@ void main() {
         '${TextMessageFormat.recordSeparator}';
     final messages = JsonHubProtocol()
         .parseMessages(payload, (level, message) => print(message));
-    expect(messages, equals([CompletionMessage()]));
+    expect(
+        messages,
+        equals([
+          CompletionMessage(invocationId: '0', result: {'data': '123'})
+        ]));
   });
 }
