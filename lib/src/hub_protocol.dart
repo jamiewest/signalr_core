@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 
@@ -175,8 +176,11 @@ class CompletionMessage extends HubInvocationMessage {
 }
 
 /// A hub message indicating that the sender is still active.
-class PingMessage extends HubMessage {
+class PingMessage extends HubMessage with EquatableMixin {
   PingMessage() : super(type: MessageType.ping);
+
+  @override
+  List<Object> get props => [type];
 }
 
 /// A hub message indicating that the sender is closing the connection.
