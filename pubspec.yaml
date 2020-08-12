@@ -13,6 +13,7 @@ dependencies:
   tuple: ^1.0.3
   web_socket_channel: ^1.1.0
   sse_client: ^0.0.3
+  equatable: ^1.2.3
 
 dev_dependencies:
   pedantic: ^1.8.0
