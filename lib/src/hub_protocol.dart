@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+import 'package:http/http.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 
@@ -152,7 +154,7 @@ class StreamItemMessage extends HubInvocationMessage {
 }
 
 /// A hub message representing the result of an invocation.
-class CompletionMessage extends HubInvocationMessage {
+class CompletionMessage extends HubInvocationMessage with EquatableMixin {
   CompletionMessage(
       {this.error,
       this.result,
@@ -172,11 +174,17 @@ class CompletionMessage extends HubInvocationMessage {
   ///
   /// Either {@link @aspnet/signalr.CompletionMessage.error} or {@link @aspnet/signalr.CompletionMessage.result} must be defined, but not both.
   final dynamic result;
+
+  @override
+  List<Object> get props => [error, result, headers, invocationId];
 }
 
 /// A hub message indicating that the sender is still active.
-class PingMessage extends HubMessage {
+class PingMessage extends HubMessage with EquatableMixin {
   PingMessage() : super(type: MessageType.ping);
+
+  @override
+  List<Object> get props => [type];
 }
 
 /// A hub message indicating that the sender is closing the connection.

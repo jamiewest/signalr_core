@@ -161,10 +161,6 @@ class JsonHubProtocol implements HubProtocol {
   }
 
   void _isCompletionMessage(CompletionMessage message) {
-    if ((message.result != null) && message.error.isNotEmpty) {
-      throw Exception('Invalid payload for Completion message.');
-    }
-
     if ((message.result == null) && (message.error != null)) {
       _assertNotEmptyString(
           message.error, 'Invalid payload for Completion message.');
