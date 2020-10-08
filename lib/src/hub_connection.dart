@@ -409,9 +409,11 @@ class HubConnection {
       _logger(LogLevel.information,
           'Reconnect attempt number ${previousReconnectAttempts} will start in ${nextRetryDelay} ms.');
 
-      await Future.value((resolve) async {
-        _reconnectDelayHandle =
-            Timer.periodic(Duration(milliseconds: nextRetryDelay), resolve);
+      await Future(() {
+        Completer completer = Completer();
+        _reconnectDelayHandle = Timer(
+            Duration(milliseconds: nextRetryDelay), () => completer.complete());
+        return completer.future;
       });
       _reconnectDelayHandle = null;
 
