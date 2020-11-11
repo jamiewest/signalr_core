@@ -81,7 +81,7 @@ class WebSocketTransport implements Transport {
           }
         }
       }, onError: (e) {
-        print(e.toString());
+        _logging(LogLevel.error, (e as Error).toString());
       }, onDone: () {
         if (opened == true) {
           _close(null);

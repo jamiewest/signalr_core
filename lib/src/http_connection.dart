@@ -458,8 +458,8 @@ class HttpConnection implements Connection {
       return url;
     }
     // TODO: Look at this...
-    return url + '?' + 'id=$connectionToken';
-    //return url + (url.contains('?') ? '?' : '&') + 'id=$connectionToken';
+    //return url + '?' + 'id=$connectionToken';
+    return url + (!url.contains('?') ? '?' : '&') + 'id=$connectionToken';
   }
 
   Future<void> _createTransport(
