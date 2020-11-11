@@ -12,7 +12,6 @@ import 'package:signalr_core/src/logger.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/status.dart' as status;
 
 class WebSocketTransport implements Transport {
   final Logging _logging;

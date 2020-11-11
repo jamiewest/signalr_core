@@ -40,18 +40,6 @@ class NegotiateResponse {
   final String error;
 }
 
-extension on NegotiateResponse {
-  Map<String, dynamic> toJson() => {
-        'connectionId': this.connectionId,
-        'connectionToken': this.connectionToken,
-        'negotiateVersion': this.negotiateVersion,
-        'availableTransports': this.availableTransports,
-        'url': this.url,
-        'accessToken': this.accessToken,
-        'error': this.error
-      };
-}
-
 extension NegotiateResponseExtensions on NegotiateResponse {
   static NegotiateResponse fromJson(Map<String, dynamic> json) {
     return NegotiateResponse(

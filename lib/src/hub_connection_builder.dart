@@ -1,5 +1,3 @@
-import 'package:http/http.dart';
-import 'package:http/http.dart' as http;
 import 'package:signalr_core/signalr_core.dart';
 
 /// A builder for configuring [HubConnection] instances.
