@@ -446,7 +446,10 @@ class HttpConnection implements Connection {
       return url;
     }
 
-    final uri = Uri.parse(url);
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      return url;
+    }
 
     return Uri(
       scheme: uri.scheme,
