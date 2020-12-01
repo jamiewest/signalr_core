@@ -445,9 +445,19 @@ class HttpConnection implements Connection {
     if (connectionToken == null) {
       return url;
     }
-    // TODO: Look at this...
-    //return url + '?' + 'id=$connectionToken';
-    return url + (!url.contains('?') ? '?' : '&') + 'id=$connectionToken';
+
+    final uri = Uri.parse(url);
+
+    return Uri(
+      scheme: uri.scheme,
+      host: uri.host,
+      path: uri.path,
+      fragment: uri.fragment,
+      queryParameters: <String, dynamic>{
+        ...uri.queryParameters,
+        ...{ 'id': connectionToken },
+      },
+    ).toString();
   }
 
   Future<void> _createTransport(
