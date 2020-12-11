@@ -454,11 +454,12 @@ class HttpConnection implements Connection {
     return Uri(
       scheme: uri.scheme,
       host: uri.host,
+      port: uri.port,
       path: uri.path,
       fragment: uri.fragment,
       queryParameters: <String, dynamic>{
         ...uri.queryParameters,
-        ...{ 'id': connectionToken },
+        ...{'id': connectionToken},
       },
     ).toString();
   }
