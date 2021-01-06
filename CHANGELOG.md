@@ -29,3 +29,7 @@
 ## 1.0.7
 
 - Bug fixes - [51cba40](https://github.com/jamiewest/signalr_core/commit/51cba400e52640b7f2fdf0dd4154061d8117e778)
+
+## 1.0.8
+
+- Bug Fixes - [dc767b9](https://github.com/jamiewest/signalr_core/commit/dc767b943a5cf9dee6d464cae5c7e015c99deb50)
