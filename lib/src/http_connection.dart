@@ -461,7 +461,7 @@ class HttpConnection implements Connection {
       host: uri.host,
       port: uri.port,
       path: uri.path,
-      fragment: uri.fragment,
+      fragment: uri.fragment.isNotEmpty ? uri.fragment : null,
       queryParameters: <String, dynamic>{
         ...uri.queryParameters,
         ...{'id': connectionToken},
