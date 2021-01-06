@@ -65,12 +65,12 @@ class HubConnection {
   Timer _timeoutHandle;
   Timer _pingServerHandle;
 
-  HubConnection(
-      {Connection connection,
-      Logging logging,
-      HubProtocol protocol,
-      RetryPolicy reconnectPolicy})
-      : _cachedPingMessage = protocol.writeMessage(PingMessage()),
+  HubConnection({
+    Connection connection,
+    Logging logging,
+    HubProtocol protocol,
+    RetryPolicy reconnectPolicy,
+  })  : _cachedPingMessage = protocol.writeMessage(PingMessage()),
         _connection = connection,
         _logger = logging,
         _protocol = protocol,

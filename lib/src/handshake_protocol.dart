@@ -5,7 +5,10 @@ import 'package:signalr_core/src/text_message_format.dart';
 import 'package:tuple/tuple.dart';
 
 class HandshakeRequestMessage {
-  HandshakeRequestMessage({this.protocol, this.version});
+  HandshakeRequestMessage({
+    this.protocol,
+    this.version,
+  });
 
   final String protocol;
 
@@ -13,7 +16,10 @@ class HandshakeRequestMessage {
 }
 
 class HandshakeResponseMessage {
-  HandshakeResponseMessage({this.error, this.minorVersion});
+  HandshakeResponseMessage({
+    this.error,
+    this.minorVersion,
+  });
 
   final String error;
 

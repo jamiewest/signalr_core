@@ -16,14 +16,15 @@ import 'package:signalr_core/src/utils.dart';
 enum ConnectionState { connecting, connected, disconnected, disconnecting }
 
 class NegotiateResponse {
-  NegotiateResponse(
-      {this.connectionId,
-      this.connectionToken,
-      this.negotiateVersion,
-      this.availableTransports,
-      this.url,
-      this.accessToken,
-      this.error});
+  NegotiateResponse({
+    this.connectionId,
+    this.connectionToken,
+    this.negotiateVersion,
+    this.availableTransports,
+    this.url,
+    this.accessToken,
+    this.error,
+  });
 
   final String connectionId;
 
@@ -43,14 +44,15 @@ class NegotiateResponse {
 extension NegotiateResponseExtensions on NegotiateResponse {
   static NegotiateResponse fromJson(Map<String, dynamic> json) {
     return NegotiateResponse(
-        connectionId: json['connectionId'],
-        connectionToken: json['connectionToken'],
-        negotiateVersion: json['negotiateVersion'],
-        availableTransports: AvailableTransportExtensions.listFromJson(
-            json['availableTransports']),
-        url: json['url'],
-        accessToken: json['accessToken'],
-        error: json['error']);
+      connectionId: json['connectionId'],
+      connectionToken: json['connectionToken'],
+      negotiateVersion: json['negotiateVersion'],
+      availableTransports: AvailableTransportExtensions.listFromJson(
+          json['availableTransports']),
+      url: json['url'],
+      accessToken: json['accessToken'],
+      error: json['error'],
+    );
   }
 }
 
@@ -65,10 +67,11 @@ class AvailableTransport {
 extension AvailableTransportExtensions on AvailableTransport {
   static AvailableTransport fromJson(Map<String, dynamic> json) {
     return AvailableTransport(
-        transport: HttpTransportTypeExtensions.fromName(json['transport']),
-        transferFormats: List<dynamic>.from(json['transferFormats'])
-            .map((value) => TransferFormatExtensions.fromName(value))
-            ?.toList());
+      transport: HttpTransportTypeExtensions.fromName(json['transport']),
+      transferFormats: List<dynamic>.from(json['transferFormats'])
+          .map((value) => TransferFormatExtensions.fromName(value))
+          ?.toList(),
+    );
   }
 
   static List<AvailableTransport> listFromJson(List<dynamic> json) {
@@ -104,9 +107,11 @@ class HttpConnection implements Connection {
 
   final int negotiateVersion = 1;
 
-  HttpConnection(
-      {@required String url, HttpConnectionOptions options, Logging log})
-      : baseUrl = url,
+  HttpConnection({
+    @required String url,
+    HttpConnectionOptions options,
+    Logging log,
+  })  : baseUrl = url,
         _client = (options.client != null) ? options.client : http.Client(),
         _options = options {
     _logging = (options.logging != null) ? options.logging : (l, m) => {};
