@@ -13,7 +13,12 @@ import 'package:signalr_core/src/transport.dart';
 import 'package:meta/meta.dart';
 import 'package:signalr_core/src/utils.dart';
 
-enum ConnectionState { connecting, connected, disconnected, disconnecting }
+enum ConnectionState {
+  connecting,
+  connected,
+  disconnected,
+  disconnecting,
+}
 
 class NegotiateResponse {
   NegotiateResponse({
@@ -27,58 +32,58 @@ class NegotiateResponse {
   });
 
   final String connectionId;
-
   String connectionToken;
-
   final int negotiateVersion;
-
   final List<AvailableTransport> availableTransports;
-
   final String url;
-
   final String accessToken;
-
   final String error;
 }
 
 extension NegotiateResponseExtensions on NegotiateResponse {
   static NegotiateResponse fromJson(Map<String, dynamic> json) {
     return NegotiateResponse(
-      connectionId: json['connectionId'],
-      connectionToken: json['connectionToken'],
-      negotiateVersion: json['negotiateVersion'],
+      connectionId: json['connectionId'] as String,
+      connectionToken: json['connectionToken'] as String,
+      negotiateVersion: json['negotiateVersion'] as int,
       availableTransports: AvailableTransportExtensions.listFromJson(
-          json['availableTransports']),
-      url: json['url'],
-      accessToken: json['accessToken'],
-      error: json['error'],
+        json['availableTransports'] as List<dynamic>,
+      ),
+      url: json['url'] as String,
+      accessToken: json['accessToken'] as String,
+      error: json['error'] as String,
     );
   }
 }
 
 class AvailableTransport {
-  AvailableTransport({this.transport, this.transferFormats});
+  AvailableTransport({
+    this.transport,
+    this.transferFormats,
+  });
 
   final HttpTransportType transport;
-
   final List<TransferFormat> transferFormats;
 }
 
 extension AvailableTransportExtensions on AvailableTransport {
   static AvailableTransport fromJson(Map<String, dynamic> json) {
     return AvailableTransport(
-      transport: HttpTransportTypeExtensions.fromName(json['transport']),
-      transferFormats: List<dynamic>.from(json['transferFormats'])
-          .map((value) => TransferFormatExtensions.fromName(value))
+      transport:
+          HttpTransportTypeExtensions.fromName(json['transport'] as String),
+      transferFormats: List<dynamic>.from(
+              json['transferFormats'] as Iterable<dynamic>)
+          .map((value) => TransferFormatExtensions.fromName(value as String))
           ?.toList(),
     );
   }
 
   static List<AvailableTransport> listFromJson(List<dynamic> json) {
     return json == null
-        ? List<AvailableTransport>()
+        ? <AvailableTransport>[]
         : json
-            .map((value) => AvailableTransportExtensions.fromJson(value))
+            .map((value) => AvailableTransportExtensions.fromJson(
+                value as Map<String, dynamic>))
             .toList();
   }
 }
@@ -99,10 +104,15 @@ class HttpConnection implements Connection {
   AccessTokenFactory _accessTokenFactory;
   TransportSendQueue _sendQueue;
 
+  @override
   final dynamic features = {};
+  @override
   String baseUrl;
+  @override
   String connectionId;
+  @override
   OnReceive onreceive;
+  @override
   OnClose onclose;
 
   final int negotiateVersion = 1;
@@ -110,9 +120,10 @@ class HttpConnection implements Connection {
   HttpConnection({
     @required String url,
     HttpConnectionOptions options,
-    Logging log,
   })  : baseUrl = url,
-        _client = (options.client != null) ? options.client : http.Client(),
+        _client = (options.client != null)
+            ? options.client
+            : http.Client() as http.BaseClient,
         _options = options {
     _logging = (options.logging != null) ? options.logging : (l, m) => {};
     _connectionState = ConnectionState.disconnected;
@@ -122,14 +133,18 @@ class HttpConnection implements Connection {
     onclose = null;
   }
 
-  Future<void> start(
-      {TransferFormat transferFormat = TransferFormat.binary}) async {
+  @override
+  Future<void> start({
+    TransferFormat transferFormat = TransferFormat.binary,
+  }) async {
     _logging(LogLevel.debug,
         'Starting connection with transfer format \'${transferFormat.toString()}\'.');
 
     if (_connectionState != ConnectionState.disconnected) {
-      return Future.error(Exception(
-          'Cannot start an HttpConnection that is not in the \'Disconnected\' state.'));
+      return Future.error(
+        Exception(
+            'Cannot start an HttpConnection that is not in the \'Disconnected\' state.'),
+      );
     }
 
     _connectionState = ConnectionState.connecting;
@@ -158,20 +173,20 @@ class HttpConnection implements Connection {
     _connectionStarted = true;
   }
 
+  @override
   Future<void> send(dynamic data) {
     if (_connectionState != ConnectionState.connected) {
       return Future.error(Exception(
           'Cannot send data if the connection is not in the \'Connected\' State.'));
     }
 
-    if (_sendQueue == null) {
-      _sendQueue = TransportSendQueue(transport: _transport);
-    }
+    _sendQueue ??= TransportSendQueue(transport: _transport);
 
     // Transport will not be null if state is connected
     return _sendQueue.send(data);
   }
 
+  @override
   Future<void> stop({Exception exception}) async {
     if (_connectionState == ConnectionState.disconnected) {
       _logging(LogLevel.debug,
@@ -315,7 +330,7 @@ class HttpConnection implements Connection {
         }
       } else {
         NegotiateResponse negotiateResponse;
-        int redirects = 0;
+        var redirects = 0;
 
         do {
           negotiateResponse = await _getNegotiationResponse(url);
@@ -385,12 +400,12 @@ class HttpConnection implements Connection {
     if (_accessTokenFactory != null) {
       final token = await _accessTokenFactory();
       if (token != null) {
-        headers['Authorization'] = 'Bearer ${token}';
+        headers['Authorization'] = 'Bearer $token';
       }
     }
 
     final negotiateUrl = _resolveNegotiateUrl(url);
-    _logging(LogLevel.debug, 'Sending negotiation request: ${negotiateUrl}.');
+    _logging(LogLevel.debug, 'Sending negotiation request: $negotiateUrl.');
 
     // TODO: Fix user agent header...
     //headers['X-SignalR-User-Agent'] = 'Microsoft SignalR/';
@@ -405,16 +420,12 @@ class HttpConnection implements Connection {
             'Unexpected status code returned from negotiate \'${response.statusCode}\''));
       }
 
-      final negotiateResponse =
-          NegotiateResponseExtensions.fromJson(json.decode(response.body));
+      final negotiateResponse = NegotiateResponseExtensions.fromJson(
+          json.decode(response.body) as Map<String, dynamic>);
 
-      // TODO: Clean up the next couple of if statements.
-      if ((negotiateResponse.negotiateVersion != null)) {
-        if (negotiateResponse.negotiateVersion < 1) {
-          // Negotiate version 0 doesn't use connectionToken
-          // So we set it equal to connectionId so all our logic can use connectionToken without being aware of the negotiate version
-          negotiateResponse.connectionToken = negotiateResponse.connectionId;
-        }
+      if ((negotiateResponse.negotiateVersion != null) &&
+          negotiateResponse.negotiateVersion < 1) {
+        negotiateResponse.connectionToken = negotiateResponse.connectionId;
       }
 
       if (negotiateResponse.negotiateVersion == null) {
@@ -441,8 +452,9 @@ class HttpConnection implements Connection {
   }
 
   Future<void> _startTransport({String url, TransferFormat transferFormat}) {
-    _transport.onreceive = onreceive;
-    _transport.onclose = (e) => _stopConnection(exception: e);
+    _transport
+      ..onreceive = onreceive
+      ..onclose = (e) => _stopConnection(exception: e);
     return _transport.connect(url, transferFormat);
   }
 
@@ -493,7 +505,10 @@ class HttpConnection implements Connection {
     for (var endpoint in transports) {
       _connectionState = ConnectionState.connecting;
       final transportOrError = _resolveTransportOrError(
-          endpoint, requestedTransport, requestedTransferFormat);
+        endpoint,
+        requestedTransport as HttpTransportType,
+        requestedTransferFormat,
+      );
 
       if (transportOrError is Exception) {
         transportExceptions.add(transportOrError);
@@ -512,7 +527,9 @@ class HttpConnection implements Connection {
 
         try {
           await _startTransport(
-              url: connectUrl, transferFormat: requestedTransferFormat);
+            url: connectUrl,
+            transferFormat: requestedTransferFormat,
+          );
           connectionId = negotiate.connectionId;
           return Future.value(null);
         } catch (e) {
@@ -534,9 +551,10 @@ class HttpConnection implements Connection {
   }
 
   dynamic _resolveTransportOrError(
-      AvailableTransport endpoint,
-      HttpTransportType requestedTransport,
-      TransferFormat requestedTransferFormat) {
+    AvailableTransport endpoint,
+    HttpTransportType requestedTransport,
+    TransferFormat requestedTransferFormat,
+  ) {
     final transport = endpoint.transport;
     if (transport == null) {
       _logging(LogLevel.debug,
@@ -570,18 +588,19 @@ class HttpConnection implements Connection {
   }
 
   bool _transportMatches(
-      HttpTransportType requestedTransport, HttpTransportType actualTransport) {
+    HttpTransportType requestedTransport,
+    HttpTransportType actualTransport,
+  ) {
     if (requestedTransport == null) {
       return true;
     } else {
-      return (requestedTransport.index == actualTransport.index);
+      return requestedTransport.index == actualTransport.index;
     }
   }
 
   Transport _constructTransport(HttpTransportType transport) {
     switch (transport) {
       case HttpTransportType.none:
-        // TODO: Handle this case.
         break;
       case HttpTransportType.webSockets:
         return WebSocketTransport(
@@ -610,7 +629,7 @@ class HttpConnection implements Connection {
 }
 
 class TransportSendQueue {
-  List<dynamic> _buffer = [];
+  final List<dynamic> _buffer = [];
   Completer _sendBufferedData;
   bool _executing = true;
   Completer _transportResult;
@@ -627,9 +646,7 @@ class TransportSendQueue {
 
   Future<void> send(dynamic data) {
     _bufferData(data);
-    if (_transportResult == null) {
-      _transportResult = Completer();
-    }
+    _transportResult ??= Completer();
     return _transportResult.future;
   }
 
@@ -674,7 +691,7 @@ class TransportSendQueue {
       if (_buffer.isNotEmpty) {
         data = (_buffer[0] is String)
             ? _buffer.join('')
-            : TransportSendQueue._concatBuffers(_buffer);
+            : TransportSendQueue._concatBuffers(_buffer as List<ByteBuffer>);
 
         _buffer.clear();
 

@@ -9,6 +9,7 @@ class HubConnectionBuilder {
   RetryPolicy reconnectPolicy;
 
   /// Configures the [HubConnection] to use HTTP-based transports to connect to the specified URL.
+  // ignore: avoid_returning_this
   HubConnectionBuilder withUrl(String url, [dynamic transportTypeOrOptions]) {
     _url = url;
 
@@ -24,12 +25,14 @@ class HubConnectionBuilder {
   }
 
   /// Configures the [HubConnection] to use the specified Hub Protocol.
+  // ignore: avoid_returning_this
   HubConnectionBuilder withHubProtocol(HubProtocol protocol) {
     _protocol = protocol;
     return this;
   }
 
   /// Configures the [HubConnection] to automatically attempt to reconnect if the connection is lost.
+  // ignore: avoid_returning_this
   HubConnectionBuilder withAutomaticReconnect(
       [dynamic retryDelaysOrReconnectPolicy]) {
     if (reconnectPolicy != null) {
@@ -39,8 +42,9 @@ class HubConnectionBuilder {
     if (retryDelaysOrReconnectPolicy == null) {
       reconnectPolicy = DefaultReconnectPolicy();
     } else if (retryDelaysOrReconnectPolicy is List) {
-      reconnectPolicy =
-          DefaultReconnectPolicy(retryDelays: retryDelaysOrReconnectPolicy);
+      reconnectPolicy = DefaultReconnectPolicy(
+        retryDelays: retryDelaysOrReconnectPolicy as List<int>,
+      );
     } else if (retryDelaysOrReconnectPolicy is RetryPolicy) {
       reconnectPolicy = retryDelaysOrReconnectPolicy;
     }
@@ -56,20 +60,19 @@ class HubConnectionBuilder {
           'The \'HubConnectionBuilder.withUrl\' method must be called before building the connection.');
     }
 
-    if (_httpConnectionOptions == null) {
-      _httpConnectionOptions =
-          HttpConnectionOptions(transport: _httpTransportType);
-    }
+    _httpConnectionOptions ??=
+        HttpConnectionOptions(transport: _httpTransportType);
 
     final connection =
         HttpConnection(url: _url, options: _httpConnectionOptions);
 
     return HubConnection(
-        connection: connection,
-        logging: (_httpConnectionOptions.logging != null)
-            ? _httpConnectionOptions.logging
-            : (l, m) => {},
-        protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
-        reconnectPolicy: reconnectPolicy);
+      connection: connection,
+      logging: (_httpConnectionOptions.logging != null)
+          ? _httpConnectionOptions.logging
+          : (l, m) => {},
+      protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
+      reconnectPolicy: reconnectPolicy,
+    );
   }
 }

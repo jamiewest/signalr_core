@@ -4,24 +4,24 @@ import 'package:http/http.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 class LongPollingTransport implements Transport {
-  BaseClient _client;
-  AccessTokenFactory _accessTokenFactory;
-  Logging _log;
-  bool _logMessageContent;
-  bool _withCredentials;
+  final BaseClient _client;
+  final AccessTokenFactory _accessTokenFactory;
+  final Logging _log;
+  final bool _logMessageContent;
+  final bool _withCredentials;
 
   String _url;
   bool _running;
   Future<void> _receiving;
   Exception _closeError;
 
-  LongPollingTransport(
-      {BaseClient client,
-      AccessTokenFactory accessTokenFactory,
-      Logging log,
-      bool logMessageContent,
-      bool withCredentials})
-      : _client = client,
+  LongPollingTransport({
+    BaseClient client,
+    AccessTokenFactory accessTokenFactory,
+    Logging log,
+    bool logMessageContent,
+    bool withCredentials,
+  })  : _client = client,
         _accessTokenFactory = accessTokenFactory,
         _log = log,
         _logMessageContent = logMessageContent,
@@ -49,13 +49,13 @@ class LongPollingTransport implements Transport {
 
     final token = await _getAccessToken();
     if (token != null) {
-      headers['Authorization'] = 'Bearer ${token}';
+      headers['Authorization'] = 'Bearer $token';
     }
 
     // Make initial long polling request
     // Server uses first long polling request to finish initializing connection and it returns without data
-    final pollUrl = '${url}&_=${DateTime.now().millisecondsSinceEpoch}';
-    _log(LogLevel.trace, '(LongPolling transport) polling: ${pollUrl}.');
+    final pollUrl = '$url&_=${DateTime.now().millisecondsSinceEpoch}';
+    _log(LogLevel.trace, '(LongPolling transport) polling: $pollUrl.');
     final response = await _client.get(pollUrl, headers: headers);
     if (response.statusCode != 200) {
       _log(LogLevel.error,
@@ -85,17 +85,18 @@ class LongPollingTransport implements Transport {
         // We have to get the access token on each poll, in case it changes
         final token = await _getAccessToken();
         if (token != null) {
-          headers['Authorization'] = 'Bearer ${token}';
+          headers['Authorization'] = 'Bearer $token';
         }
 
-        final pollUrl = '${url}&_=${DateTime.now().millisecondsSinceEpoch}';
-        _log(LogLevel.trace, '(LongPolling transport) polling: ${pollUrl}.');
-        final response = await _client
-            .get(pollUrl, headers: headers)
-            .timeout(const Duration(milliseconds: 100000), onTimeout: () {
-          _log(LogLevel.warning, 'Timeout from HTTP request.');
-          throw TimeoutException('A timeout occurred.');
-        });
+        final pollUrl = '$url&_=${DateTime.now().millisecondsSinceEpoch}';
+        _log(LogLevel.trace, '(LongPolling transport) polling: $pollUrl.');
+        final response = await _client.get(pollUrl, headers: headers).timeout(
+          const Duration(milliseconds: 100000),
+          onTimeout: () {
+            _log(LogLevel.warning, 'Timeout from HTTP request.');
+            throw TimeoutException('A timeout occurred.');
+          },
+        );
 
         if (response.statusCode == 204) {
           _log(LogLevel.information,
@@ -137,7 +138,7 @@ class LongPollingTransport implements Transport {
               '(LongPolling transport) Poll timed out, reissuing.');
         } else {
           // Close the connection with the error as the result.
-          _closeError = e;
+          _closeError = e as Exception;
           _running = false;
         }
       }
@@ -158,8 +159,16 @@ class LongPollingTransport implements Transport {
       return Future.error(
           Exception('Cannot send until the transport is connected'));
     }
-    return sendMessage(_log, 'LongPolling', _client, _url, _accessTokenFactory,
-        data, _logMessageContent, _withCredentials);
+    return sendMessage(
+      _log,
+      'LongPolling',
+      _client,
+      _url,
+      _accessTokenFactory,
+      data,
+      _logMessageContent,
+      _withCredentials,
+    );
   }
 
   @override
@@ -175,7 +184,7 @@ class LongPollingTransport implements Transport {
 
       // Send DELETE to clean up long polling on the server
       _log(LogLevel.trace,
-          '(LongPolling transport) sending DELETE request to ${_url}.');
+          '(LongPolling transport) sending DELETE request to $_url.');
 
       final headers = <String, String>{};
       final userAgentHeader = getUserAgentHeader();
@@ -183,7 +192,7 @@ class LongPollingTransport implements Transport {
 
       final token = await _getAccessToken();
       if (token != null) {
-        headers['Authorization'] = 'Bearer ${token}';
+        headers['Authorization'] = 'Bearer $token';
       }
 
       await _client.delete(_url, headers: headers);

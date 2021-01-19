@@ -5,21 +5,19 @@ class TextMessageFormat {
       String.fromCharCode(TextMessageFormat.RecordSeparatorCode);
 
   static String write(String output) {
-    return "$output${TextMessageFormat.recordSeparator}";
+    return '$output${TextMessageFormat.recordSeparator}';
   }
 
   static List<String> parse(String input) {
     if (input.isEmpty) {
-      throw Exception("Message is incomplete.");
+      throw Exception('Message is incomplete.');
     }
 
     if (input[input.length - 1] != TextMessageFormat.recordSeparator) {
-      throw Exception("Message is incomplete.");
+      throw Exception('Message is incomplete.');
     }
 
-    var messages = input.split(TextMessageFormat.recordSeparator);
-
-    messages.removeLast();
+    var messages = input.split(TextMessageFormat.recordSeparator)..removeLast();
     return messages;
   }
 }

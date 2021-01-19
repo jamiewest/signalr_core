@@ -10,15 +10,16 @@ void main() {
     final builder = HubConnectionBuilder().withAutomaticReconnect();
 
     var retryCount = 0;
-    defaultRetryDelaysInMilliseconds.forEach((delay) {
+    for (var delay in defaultRetryDelaysInMilliseconds) {
       final retryContext = RetryContext(
-          previousRetryCount: retryCount++,
-          elapsedMilliseconds: 0,
-          retryReason: Exception());
+        previousRetryCount: retryCount++,
+        elapsedMilliseconds: 0,
+        retryReason: Exception(),
+      );
 
       expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
           delay);
-    });
+    }
   });
 
   test('withAutomaticReconnect uses custom retryDelays when provided', () {
@@ -27,15 +28,16 @@ void main() {
         HubConnectionBuilder().withAutomaticReconnect(customRetryDelays);
 
     var retryCount = 0;
-    customRetryDelays.forEach((delay) {
+    for (var delay in customRetryDelays) {
       final retryContext = RetryContext(
-          previousRetryCount: retryCount++,
-          elapsedMilliseconds: 0,
-          retryReason: Exception());
+        previousRetryCount: retryCount++,
+        elapsedMilliseconds: 0,
+        retryReason: Exception(),
+      );
 
       expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
           delay);
-    });
+    }
 
     // TODO: This test fails in Dart but looks like works using Typescript's testing framework
     // final retryContextFinal = RetryContext(
@@ -54,15 +56,16 @@ void main() {
         DefaultReconnectPolicy(retryDelays: customRetryDelays));
 
     var retryCount = 0;
-    customRetryDelays.forEach((delay) {
+    for (var delay in customRetryDelays) {
       final retryContext = RetryContext(
-          previousRetryCount: retryCount++,
-          elapsedMilliseconds: 0,
-          retryReason: Exception());
+        previousRetryCount: retryCount++,
+        elapsedMilliseconds: 0,
+        retryReason: Exception(),
+      );
 
       expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
           delay);
-    });
+    }
 
     // TODO: This test fails in Dart but looks like works using Typescript's testing framework
     // final retryContextFinal = RetryContext(

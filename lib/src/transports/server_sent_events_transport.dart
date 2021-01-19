@@ -8,21 +8,21 @@ import 'package:signalr_core/src/utils.dart';
 import 'package:sse_client/sse_client.dart';
 
 class ServerSentEventsTransport implements Transport {
-  BaseClient _client;
-  AccessTokenFactory _accessTokenFactory;
-  Logging _log;
-  bool _logMessageContent;
-  bool _withCredentials;
+  final BaseClient _client;
+  final AccessTokenFactory _accessTokenFactory;
+  final Logging _log;
+  final bool _logMessageContent;
+  final bool _withCredentials;
   String _url;
   SseClient _sseClient;
 
-  ServerSentEventsTransport(
-      {BaseClient client,
-      AccessTokenFactory accessTokenFactory,
-      Logging logging,
-      bool logMessageContent,
-      bool withCredentials})
-      : _client = client,
+  ServerSentEventsTransport({
+    BaseClient client,
+    AccessTokenFactory accessTokenFactory,
+    Logging logging,
+    bool logMessageContent,
+    bool withCredentials,
+  })  : _client = client,
         _accessTokenFactory = accessTokenFactory,
         _log = logging,
         _logMessageContent = logMessageContent,
@@ -56,14 +56,16 @@ class ServerSentEventsTransport implements Transport {
 
     var opened = false;
     if (transferFormat != TransferFormat.text) {
-      return completer.completeError(Exception(
-          'The Server-Sent Events transport only supports the \'Text\' transfer format'));
+      return completer.completeError(
+        Exception(
+            'The Server-Sent Events transport only supports the \'Text\' transfer format'),
+      );
     }
 
-    var client;
+    SseClient client;
     try {
       client = SseClient.connect(Uri.parse(url));
-      _log(LogLevel.information, 'SSE connected to ${_url}');
+      _log(LogLevel.information, 'SSE connected to $_url');
       opened = true;
       _sseClient = client;
       completer.complete();
@@ -77,7 +79,7 @@ class ServerSentEventsTransport implements Transport {
       onreceive(data);
     }, onError: (e) {
       if (opened) {
-        _close(exception: e);
+        _close(exception: e as Exception);
       } else {
         completer.completeError(e);
       }
@@ -92,8 +94,16 @@ class ServerSentEventsTransport implements Transport {
       return Future.error(
           Exception('Cannot send until the transport is connected'));
     }
-    return sendMessage(_log, 'SSE', _client, _url, _accessTokenFactory, data,
-        _logMessageContent, _withCredentials);
+    return sendMessage(
+      _log,
+      'SSE',
+      _client,
+      _url,
+      _accessTokenFactory,
+      data,
+      _logMessageContent,
+      _withCredentials,
+    );
   }
 
   @override

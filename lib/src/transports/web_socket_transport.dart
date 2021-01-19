@@ -1,17 +1,16 @@
 import 'dart:async';
 
 import 'package:http/http.dart';
+import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/transport.dart';
+import 'package:signalr_core/src/utils.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'web_socket_channel_api.dart'
     // ignore: uri_does_not_exist
     if (dart.library.html) 'web_socket_channel_html.dart'
     // ignore: uri_does_not_exist
     if (dart.library.io) 'web_socket_channel_io.dart' as platform;
-
-import 'package:signalr_core/src/logger.dart';
-import 'package:signalr_core/src/transport.dart';
-import 'package:signalr_core/src/utils.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketTransport implements Transport {
   final Logging _logging;
@@ -52,12 +51,12 @@ class WebSocketTransport implements Transport {
       final token = await _accessTokenFactory();
       if (token.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
-        url += (url.contains('?') ? '&' : '?') + "access_token=$encodedToken";
+        url += (url.contains('?') ? '&' : '?') + 'access_token=$encodedToken';
       }
     }
 
     final connectFuture = Completer<void>();
-    bool opened = false;
+    var opened = false;
 
     url = url.replaceFirst(RegExp(r'^http'), 'ws');
 
@@ -75,7 +74,7 @@ class WebSocketTransport implements Transport {
           try {
             onreceive(data);
           } catch (e1) {
-            _close(e1);
+            _close(e1 as Exception);
             return;
           }
         }
@@ -115,7 +114,7 @@ class WebSocketTransport implements Transport {
 
   void _close(Exception error) {
     var closeCode = 0;
-    var closeReason;
+    String closeReason;
     if (_channel != null) {
       closeCode = _channel.closeCode ?? 0;
       closeReason = _channel.closeReason;
@@ -131,8 +130,10 @@ class WebSocketTransport implements Transport {
         onclose(error);
       } else {
         if (closeCode != 0 && closeCode != 1000) {
-          onclose(Exception(
-              'WebSocket closed with status code: $closeCode ($closeReason).'));
+          onclose(
+            Exception(
+                'WebSocket closed with status code: $closeCode ($closeReason).'),
+          );
         }
         onclose(null);
       }
