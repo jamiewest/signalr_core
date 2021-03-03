@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:http/http.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 

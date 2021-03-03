@@ -10,7 +10,7 @@ typedef OnClose = void Function(Exception error);
 typedef AccessTokenFactory = Future<String> Function();
 typedef Logging = void Function(LogLevel level, String message);
 
-const String version = "0.0.0-DEV_BUILD";
+const String version = '0.0.0-DEV_BUILD';
 
 String getDataDetail(dynamic data, bool includeContent) {
   var detail = '';
@@ -34,10 +34,10 @@ String formatByteBuffer(ByteBuffer data) {
   final view = data.asUint8List();
 
   var str = '';
-  view.forEach((n) {
+  for (var n in view) {
     final pad = n < 16 ? '0' : '';
-    str += '0x${pad}${n.toStringAsFixed(16)} ';
-  });
+    str += '0x$pad${n.toStringAsFixed(16)} ';
+  }
 
   return str.substring(0, str.length - 1);
 }
@@ -56,7 +56,7 @@ Future<void> sendMessage(
     final token = await accessTokenFactory();
     if (token != null) {
       headers = {
-        'Authorization': 'Bearer ${token}',
+        'Authorization': 'Bearer $token',
       };
     }
   }
@@ -65,7 +65,7 @@ Future<void> sendMessage(
   headers[userAgentHeader.item1] = userAgentHeader.item2;
 
   log(LogLevel.trace,
-      '(${transportName} transport) sending data. ${getDataDetail(content, logMessageContent)}.');
+      '($transportName transport) sending data. ${getDataDetail(content, logMessageContent)}.');
 
   final encoding = (content is ByteBuffer)
       ? Encoding.getByName('')
@@ -74,7 +74,7 @@ Future<void> sendMessage(
       headers: headers, body: content, encoding: encoding);
 
   log(LogLevel.trace,
-      '(${transportName} transport) request complete. Response status: ${response.statusCode}.');
+      '($transportName transport) request complete. Response status: ${response.statusCode}.');
 }
 
 Tuple2<String, String> getUserAgentHeader() {
@@ -92,22 +92,22 @@ String _constructUserAgent(
   String runtimeVersion,
 ) {
   // Microsoft SignalR/[Version] ([Detailed Version]; [Operating System]; [Runtime]; [Runtime Version])
-  String userAgent = 'Microsoft SignalR/';
+  var userAgent = 'Microsoft SignalR/';
 
   final majorAndMinor = version.split('.');
   userAgent += '${majorAndMinor[0]}.${majorAndMinor[1]}';
-  userAgent += ' (${version}; ';
+  userAgent += ' ($version; ';
 
   if ((os != null) && os.isNotEmpty) {
-    userAgent += '${os}; ';
+    userAgent += '$os; ';
   } else {
     userAgent += 'Unknown OS; ';
   }
 
-  userAgent += '${runtime}';
+  userAgent += '$runtime';
 
   if (runtimeVersion != null) {
-    userAgent += '; ${runtimeVersion}';
+    userAgent += '; $runtimeVersion';
   } else {
     userAgent += '; Unknown Runtime Version';
   }

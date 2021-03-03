@@ -2,7 +2,10 @@ import 'package:signalr_core/src/transport.dart' as transfer;
 import 'package:signalr_core/src/utils.dart';
 
 abstract class Connection {
-  Connection({this.features, this.connectionId});
+  Connection({
+    this.features,
+    this.connectionId,
+  });
 
   final dynamic features;
 
@@ -14,9 +17,9 @@ abstract class Connection {
 
   OnClose onclose;
 
-  Future<void> start(
-      {transfer.TransferFormat transferFormat =
-          transfer.TransferFormat.binary});
+  Future<void> start({
+    transfer.TransferFormat transferFormat = transfer.TransferFormat.binary,
+  });
 
   Future<void> send(dynamic data);
 
