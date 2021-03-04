@@ -32,7 +32,7 @@ class JsonHubProtocol implements HubProtocol {
     final hubMessages = <HubMessage?>[];
 
     // ignore: unnecessary_null_comparison
-    if (input != null) {
+    if (input == null) {
       return hubMessages;
     }
 

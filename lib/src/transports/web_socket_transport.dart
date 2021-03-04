@@ -60,12 +60,12 @@ class WebSocketTransport implements Transport {
 
     url = url!.replaceFirst(RegExp(r'^http'), 'ws');
 
-    _channel = await platform.connect(Uri.parse(url), client: _client);
+    _channel = await platform.connect(Uri.parse(url), client: _client!);
 
     _logging!(LogLevel.information, 'WebSocket connected to $url.');
     opened = true;
 
-    _streamSubscription = _channel!.stream.listen((data) {
+    _streamSubscription = _channel?.stream.listen((data) {
       var dataDetail = getDataDetail(data, _logMessageContent);
       _logging!(
           LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
