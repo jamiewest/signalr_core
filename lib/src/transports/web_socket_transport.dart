@@ -31,14 +31,14 @@ class WebSocketTransport implements Transport {
         _logMessageContent = logMessageContent,
         _client = client {
     onreceive = null;
-    onreceive = null;
+    onclose = null;
   }
 
   @override
-  var onclose;
+  OnClose onclose;
 
   @override
-  var onreceive;
+  OnReceive onreceive;
 
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {

@@ -32,10 +32,10 @@ class LongPollingTransport implements Transport {
   }
 
   @override
-  var onclose;
+  OnClose onclose;
 
   @override
-  var onreceive;
+  OnReceive onreceive;
 
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {
@@ -56,7 +56,7 @@ class LongPollingTransport implements Transport {
     // Server uses first long polling request to finish initializing connection and it returns without data
     final pollUrl = '$url&_=${DateTime.now().millisecondsSinceEpoch}';
     _log(LogLevel.trace, '(LongPolling transport) polling: $pollUrl.');
-    final response = await _client.get(pollUrl, headers: headers);
+    final response = await _client.get(Uri.parse(pollUrl), headers: headers);
     if (response.statusCode != 200) {
       _log(LogLevel.error,
           '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
@@ -90,7 +90,8 @@ class LongPollingTransport implements Transport {
 
         final pollUrl = '$url&_=${DateTime.now().millisecondsSinceEpoch}';
         _log(LogLevel.trace, '(LongPolling transport) polling: $pollUrl.');
-        final response = await _client.get(pollUrl, headers: headers).timeout(
+        final response =
+            await _client.get(Uri.parse(pollUrl), headers: headers).timeout(
           const Duration(milliseconds: 100000),
           onTimeout: () {
             _log(LogLevel.warning, 'Timeout from HTTP request.');
@@ -195,7 +196,7 @@ class LongPollingTransport implements Transport {
         headers['Authorization'] = 'Bearer $token';
       }
 
-      await _client.delete(_url, headers: headers);
+      await _client.delete(Uri.parse(_url), headers: headers);
 
       _log(LogLevel.trace, '(LongPolling transport) DELETE request sent.');
     } finally {

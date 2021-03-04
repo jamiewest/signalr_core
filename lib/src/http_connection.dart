@@ -412,7 +412,7 @@ class HttpConnection implements Connection {
     headers['Content-Type'] = 'text/plain;charset=UTF-8';
 
     try {
-      final response = await _client.post(negotiateUrl,
+      final response = await _client.post(Uri.parse(negotiateUrl),
           headers: Map<String, String>.from(headers));
 
       if (response.statusCode != 200) {
@@ -687,9 +687,8 @@ class TransportSendQueue {
       final transportResult = _transportResult;
       _transportResult = null;
 
-      var data;
       if (_buffer.isNotEmpty) {
-        data = (_buffer[0] is String)
+        final data = (_buffer[0] is String)
             ? _buffer.join('')
             : TransportSendQueue._concatBuffers(_buffer as List<ByteBuffer>);
 

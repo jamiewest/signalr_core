@@ -32,10 +32,10 @@ class ServerSentEventsTransport implements Transport {
   }
 
   @override
-  var onclose;
+  OnClose onclose;
 
   @override
-  var onreceive;
+  OnReceive onreceive;
 
   @override
   Future<void> connect(String url, TransferFormat transferFormat) async {

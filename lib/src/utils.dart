@@ -70,7 +70,7 @@ Future<void> sendMessage(
   final encoding = (content is ByteBuffer)
       ? Encoding.getByName('')
       : Encoding.getByName('UTF-8');
-  final response = await client.post(url,
+  final response = await client.post(Uri.parse(url),
       headers: headers, body: content, encoding: encoding);
 
   log(LogLevel.trace,
