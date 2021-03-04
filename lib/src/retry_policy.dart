@@ -1,7 +1,7 @@
 /// An abstraction that controls when the client attempts to reconnect and how many attempts to do so.
 abstract class RetryPolicy {
   /// Called after the transport loses the connection.
-  int nextRetryDelayInMilliseconds(RetryContext retryContext);
+  int? nextRetryDelayInMilliseconds(RetryContext retryContext);
 }
 
 class RetryContext {
@@ -12,11 +12,11 @@ class RetryContext {
   });
 
   /// The number of consecutive failed tries so far.
-  final int previousRetryCount;
+  final int? previousRetryCount;
 
   /// The amount of time in milliseconds spent retrying so far.
-  final int elapsedMilliseconds;
+  final int? elapsedMilliseconds;
 
   /// The error that forced the upcoming retry.
-  final Exception retryReason;
+  final Exception? retryReason;
 }

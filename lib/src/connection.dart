@@ -9,19 +9,19 @@ abstract class Connection {
 
   final dynamic features;
 
-  final String connectionId;
+  final String? connectionId;
 
-  String baseUrl;
+  String? baseUrl;
 
-  OnReceive onreceive;
+  OnReceive? onreceive;
 
-  OnClose onclose;
+  OnClose? onclose;
 
   Future<void> start({
-    transfer.TransferFormat transferFormat = transfer.TransferFormat.binary,
+    transfer.TransferFormat? transferFormat = transfer.TransferFormat.binary,
   });
 
   Future<void> send(dynamic data);
 
-  Future<void> stop({Exception exception});
+  Future<void> stop({Exception? exception});
 }

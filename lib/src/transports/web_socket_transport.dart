@@ -13,19 +13,19 @@ import 'web_socket_channel_api.dart'
     if (dart.library.io) 'web_socket_channel_io.dart' as platform;
 
 class WebSocketTransport implements Transport {
-  final Logging _logging;
-  final AccessTokenFactory _accessTokenFactory;
-  final bool _logMessageContent;
-  final BaseClient _client;
+  final Logging? _logging;
+  final AccessTokenFactory? _accessTokenFactory;
+  final bool? _logMessageContent;
+  final BaseClient? _client;
 
-  StreamSubscription<dynamic> _streamSubscription;
-  WebSocketChannel _channel;
+  StreamSubscription<dynamic>? _streamSubscription;
+  WebSocketChannel? _channel;
 
   WebSocketTransport({
-    BaseClient client,
-    AccessTokenFactory accessTokenFactory,
-    Logging logging,
-    bool logMessageContent,
+    BaseClient? client,
+    AccessTokenFactory? accessTokenFactory,
+    Logging? logging,
+    bool? logMessageContent,
   })  : _logging = logging,
         _accessTokenFactory = accessTokenFactory,
         _logMessageContent = logMessageContent,
@@ -35,50 +35,50 @@ class WebSocketTransport implements Transport {
   }
 
   @override
-  OnClose onclose;
+  OnClose? onclose;
 
   @override
-  OnReceive onreceive;
+  OnReceive? onreceive;
 
   @override
-  Future<void> connect(String url, TransferFormat transferFormat) async {
+  Future<void> connect(String? url, TransferFormat? transferFormat) async {
     assert(url != null);
     assert(transferFormat != null);
 
-    _logging(LogLevel.trace, '(WebSockets transport) Connecting.');
+    _logging!(LogLevel.trace, '(WebSockets transport) Connecting.');
 
     if (_accessTokenFactory != null) {
-      final token = await _accessTokenFactory();
+      final token = await (_accessTokenFactory!() as FutureOr<String>);
       if (token.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
-        url += (url.contains('?') ? '&' : '?') + 'access_token=$encodedToken';
+        url = url! + (url.contains('?') ? '&' : '?') + 'access_token=$encodedToken';
       }
     }
 
     final connectFuture = Completer<void>();
     var opened = false;
 
-    url = url.replaceFirst(RegExp(r'^http'), 'ws');
+    url = url!.replaceFirst(RegExp(r'^http'), 'ws');
 
     _channel = await platform.connect(Uri.parse(url), client: _client);
 
-    _logging(LogLevel.information, 'WebSocket connected to $url.');
+    _logging!(LogLevel.information, 'WebSocket connected to $url.');
     opened = true;
 
-    _streamSubscription = _channel.stream.listen((data) {
+    _streamSubscription = _channel!.stream.listen((data) {
       var dataDetail = getDataDetail(data, _logMessageContent);
-      _logging(
+      _logging!(
           LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
       if (onreceive != null) {
         try {
-          onreceive(data);
+          onreceive!(data);
         } on Exception catch (e1) {
           _close(e1);
           return;
         }
       }
     }, onError: (e) {
-      _logging(LogLevel.error,
+      _logging!(LogLevel.error,
           '(WebSockets transport) socket error: ${e.toString()}}');
     }, onDone: () {
       if (opened == true) {
@@ -95,9 +95,9 @@ class WebSocketTransport implements Transport {
       return Future.error(Exception('WebSocket is not in the OPEN state'));
     }
 
-    _logging(LogLevel.trace,
+    _logging!(LogLevel.trace,
         '(WebSockets transport) sending data. ${getDataDetail(data, _logMessageContent)}.');
-    _channel.sink.add(data);
+    _channel!.sink.add(data);
     return Future.value();
   }
 
@@ -109,30 +109,30 @@ class WebSocketTransport implements Transport {
     return Future.value();
   }
 
-  void _close(Exception error) {
+  void _close(Exception? error) {
     var closeCode = 0;
-    String closeReason;
+    String? closeReason;
     if (_channel != null) {
-      closeCode = _channel.closeCode ?? 0;
-      closeReason = _channel.closeReason;
-      _streamSubscription.cancel();
+      closeCode = _channel!.closeCode ?? 0;
+      closeReason = _channel!.closeReason;
+      _streamSubscription!.cancel();
       _streamSubscription = null;
-      _channel.sink.close();
+      _channel!.sink.close();
       _channel = null;
     }
 
-    _logging(LogLevel.trace, '(WebSockets transport) socket closed.');
+    _logging!(LogLevel.trace, '(WebSockets transport) socket closed.');
     if (onclose != null) {
       if (error != null) {
-        onclose(error);
+        onclose!(error);
       } else {
         if (closeCode != 0 && closeCode != 1000) {
-          onclose(
+          onclose!(
             Exception(
                 'WebSocket closed with status code: $closeCode ($closeReason).'),
           );
         }
-        onclose(null);
+        onclose!(null);
       }
     }
   }

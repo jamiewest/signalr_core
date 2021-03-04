@@ -15,7 +15,7 @@ enum HttpTransportType {
 }
 
 extension HttpTransportTypeExtensions on HttpTransportType {
-  static HttpTransportType fromName(String name) {
+  static HttpTransportType fromName(String? name) {
     switch (name) {
       case 'none':
         {
@@ -68,9 +68,9 @@ extension TransferFormatExtensions on TransferFormat {
 ///
 /// This is designed to support the framework and not intended for use by applications.
 abstract class Transport {
-  Future<void> connect(String url, TransferFormat transferFormat);
+  Future<void> connect(String? url, TransferFormat? transferFormat);
   Future<void> send(dynamic data);
   Future<void> stop();
-  OnReceive onreceive;
-  OnClose onclose;
+  OnReceive? onreceive;
+  OnClose? onclose;
 }
