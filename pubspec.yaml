@@ -13,9 +13,7 @@ dependencies:
   meta: ^1.3.0
   tuple: ^2.0.0-nullsafety.0
   web_socket_channel: ^2.0.0
-  sse_client:
-    git:
-      url: https://github.com/Mol0ko/sse_client
+  sse_client: ^0.1.0
   equatable: ^2.0.0
 
 dev_dependencies:
