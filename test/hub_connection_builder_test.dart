@@ -17,7 +17,7 @@ void main() {
         retryReason: Exception(),
       );
 
-      expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
+      expect(builder.reconnectPolicy!.nextRetryDelayInMilliseconds(retryContext),
           delay);
     }
   });
@@ -35,7 +35,7 @@ void main() {
         retryReason: Exception(),
       );
 
-      expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
+      expect(builder.reconnectPolicy!.nextRetryDelayInMilliseconds(retryContext),
           delay);
     }
 
@@ -63,7 +63,7 @@ void main() {
         retryReason: Exception(),
       );
 
-      expect(builder.reconnectPolicy.nextRetryDelayInMilliseconds(retryContext),
+      expect(builder.reconnectPolicy!.nextRetryDelayInMilliseconds(retryContext),
           delay);
     }
 

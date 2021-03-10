@@ -10,8 +10,8 @@ class HandshakeRequestMessage {
     this.version,
   });
 
-  final String protocol;
-  final int version;
+  final String? protocol;
+  final int? version;
 }
 
 class HandshakeResponseMessage {
@@ -20,8 +20,8 @@ class HandshakeResponseMessage {
     this.minorVersion,
   });
 
-  final String error;
-  final int minorVersion;
+  final String? error;
+  final int? minorVersion;
 }
 
 extension on HandshakeRequestMessage {
@@ -34,8 +34,8 @@ extension on HandshakeRequestMessage {
 extension HandshakeResponseMessageExtensions on HandshakeResponseMessage {
   static HandshakeResponseMessage fromJson(Map<String, dynamic> json) {
     return HandshakeResponseMessage(
-      error: json['error'] as String,
-      minorVersion: json['minorVersion'] as int,
+      error: json['error'] as String?,
+      minorVersion: json['minorVersion'] as int?,
     );
   }
 }

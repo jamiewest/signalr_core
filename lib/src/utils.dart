@@ -6,23 +6,23 @@ import 'package:signalr_core/src/logger.dart';
 import 'package:tuple/tuple.dart';
 
 typedef OnReceive = void Function(dynamic data);
-typedef OnClose = void Function(Exception error);
-typedef AccessTokenFactory = Future<String> Function();
+typedef OnClose = void Function(Exception? error);
+typedef AccessTokenFactory = Future<String?> Function();
 typedef Logging = void Function(LogLevel level, String message);
 
 const String version = '0.0.0-DEV_BUILD';
 
-String getDataDetail(dynamic data, bool includeContent) {
+String getDataDetail(dynamic data, bool? includeContent) {
   var detail = '';
 
   if (data is ByteBuffer) {
     detail = 'Binary data of length ${data.lengthInBytes}';
-    if (includeContent) {
+    if (includeContent!) {
       detail += '. Content: \'${formatByteBuffer(data)}\'';
     }
   } else if (data is String) {
     detail = 'String data of length \'${data.length}\'';
-    if (includeContent) {
+    if (includeContent!) {
       detail += '. Content: \'$data\'';
     }
   }
@@ -43,14 +43,14 @@ String formatByteBuffer(ByteBuffer data) {
 }
 
 Future<void> sendMessage(
-    Logging log,
+    Logging? log,
     String transportName,
-    BaseClient client,
-    String url,
-    AccessTokenFactory accessTokenFactory,
+    BaseClient? client,
+    String? url,
+    AccessTokenFactory? accessTokenFactory,
     dynamic content,
-    bool logMessageContent,
-    bool withCredentials) async {
+    bool? logMessageContent,
+    bool? withCredentials) async {
   var headers = <String, String>{};
   if (accessTokenFactory != null) {
     final token = await accessTokenFactory();
@@ -64,17 +64,17 @@ Future<void> sendMessage(
   final userAgentHeader = getUserAgentHeader();
   headers[userAgentHeader.item1] = userAgentHeader.item2;
 
-  log(LogLevel.trace,
+  log?.call(LogLevel.trace,
       '($transportName transport) sending data. ${getDataDetail(content, logMessageContent)}.');
 
   final encoding = (content is ByteBuffer)
       ? Encoding.getByName('')
       : Encoding.getByName('UTF-8');
-  final response = await client.post(url,
+  final response = await client?.post(Uri.parse(url ?? ''),
       headers: headers, body: content, encoding: encoding);
 
-  log(LogLevel.trace,
-      '($transportName transport) request complete. Response status: ${response.statusCode}.');
+  log?.call(LogLevel.trace,
+      '($transportName transport) request complete. Response status: ${response?.statusCode}.');
 }
 
 Tuple2<String, String> getUserAgentHeader() {
@@ -98,7 +98,7 @@ String _constructUserAgent(
   userAgent += '${majorAndMinor[0]}.${majorAndMinor[1]}';
   userAgent += ' ($version; ';
 
-  if ((os != null) && os.isNotEmpty) {
+  if (os.isNotEmpty) {
     userAgent += '$os; ';
   } else {
     userAgent += 'Unknown OS; ';
@@ -106,7 +106,7 @@ String _constructUserAgent(
 
   userAgent += '$runtime';
 
-  if (runtimeVersion != null) {
+  if (runtimeVersion.isNotEmpty) {
     userAgent += '; $runtimeVersion';
   } else {
     userAgent += '; Unknown Runtime Version';

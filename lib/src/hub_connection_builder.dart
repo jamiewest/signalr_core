@@ -2,11 +2,11 @@ import 'package:signalr_core/signalr_core.dart';
 
 /// A builder for configuring [HubConnection] instances.
 class HubConnectionBuilder {
-  HubProtocol _protocol;
-  HttpConnectionOptions _httpConnectionOptions;
-  HttpTransportType _httpTransportType;
-  String _url;
-  RetryPolicy reconnectPolicy;
+  HubProtocol? _protocol;
+  HttpConnectionOptions? _httpConnectionOptions;
+  HttpTransportType? _httpTransportType;
+  String? _url;
+  RetryPolicy? reconnectPolicy;
 
   /// Configures the [HubConnection] to use HTTP-based transports to connect to the specified URL.
   // ignore: avoid_returning_this
@@ -64,14 +64,14 @@ class HubConnectionBuilder {
         HttpConnectionOptions(transport: _httpTransportType);
 
     final connection =
-        HttpConnection(url: _url, options: _httpConnectionOptions);
+        HttpConnection(url: _url, options: _httpConnectionOptions!);
 
     return HubConnection(
       connection: connection,
-      logging: (_httpConnectionOptions.logging != null)
-          ? _httpConnectionOptions.logging
+      logging: (_httpConnectionOptions!.logging != null)
+          ? _httpConnectionOptions!.logging
           : (l, m) => {},
-      protocol: (_protocol == null) ? JsonHubProtocol() : _protocol,
+      protocol: (_protocol == null) ? JsonHubProtocol() : _protocol!,
       reconnectPolicy: reconnectPolicy,
     );
   }

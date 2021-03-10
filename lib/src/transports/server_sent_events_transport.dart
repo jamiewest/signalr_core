@@ -8,20 +8,20 @@ import 'package:signalr_core/src/utils.dart';
 import 'package:sse_client/sse_client.dart';
 
 class ServerSentEventsTransport implements Transport {
-  final BaseClient _client;
-  final AccessTokenFactory _accessTokenFactory;
-  final Logging _log;
-  final bool _logMessageContent;
-  final bool _withCredentials;
-  String _url;
-  SseClient _sseClient;
+  final BaseClient? _client;
+  final AccessTokenFactory? _accessTokenFactory;
+  final Logging? _log;
+  final bool? _logMessageContent;
+  final bool? _withCredentials;
+  String? _url;
+  SseClient? _sseClient;
 
   ServerSentEventsTransport({
-    BaseClient client,
-    AccessTokenFactory accessTokenFactory,
-    Logging logging,
-    bool logMessageContent,
-    bool withCredentials,
+    BaseClient? client,
+    AccessTokenFactory? accessTokenFactory,
+    Logging? logging,
+    bool? logMessageContent,
+    bool? withCredentials,
   })  : _client = client,
         _accessTokenFactory = accessTokenFactory,
         _log = logging,
@@ -32,22 +32,23 @@ class ServerSentEventsTransport implements Transport {
   }
 
   @override
-  var onclose;
+  OnClose? onclose;
 
   @override
-  var onreceive;
+  OnReceive? onreceive;
 
   @override
-  Future<void> connect(String url, TransferFormat transferFormat) async {
-    _log(LogLevel.trace, '(SSE transport) Connecting.');
+  Future<void> connect(String? url, TransferFormat? transferFormat) async {
+    _log!(LogLevel.trace, '(SSE transport) Connecting.');
 
     // set url before accessTokenFactory because this.url is only for send and we set the auth header instead of the query string for send
     _url = url;
 
     if (_accessTokenFactory != null) {
-      final token = await _accessTokenFactory();
-      if (token != null) {
-        _url += (!url.contains('?') ? '?' : '&') +
+      final token = await _accessTokenFactory!();
+      if (token != null && _url != null) {
+        _url = _url! +
+            (!url!.contains('?') ? '?' : '&') +
             'access_token=${Uri.encodeComponent(token)}';
       }
     }
@@ -64,8 +65,8 @@ class ServerSentEventsTransport implements Transport {
 
     SseClient client;
     try {
-      client = SseClient.connect(Uri.parse(url));
-      _log(LogLevel.information, 'SSE connected to $_url');
+      client = SseClient.connect(Uri.parse(url!));
+      _log!(LogLevel.information, 'SSE connected to $_url');
       opened = true;
       _sseClient = client;
       completer.complete();
@@ -73,14 +74,14 @@ class ServerSentEventsTransport implements Transport {
       return completer.completeError(e);
     }
 
-    _sseClient.stream.listen((data) {
-      _log(LogLevel.trace,
+    _sseClient!.stream!.listen((data) {
+      _log!(LogLevel.trace,
           '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
-      onreceive(data);
+      onreceive!(data);
     }, onError: (e) {
       if (opened) {
         _close(exception: e as Exception);
-      } else {
+      } else if (e is Object) {
         completer.completeError(e);
       }
     });
@@ -95,10 +96,10 @@ class ServerSentEventsTransport implements Transport {
           Exception('Cannot send until the transport is connected'));
     }
     return sendMessage(
-      _log,
+      _log!,
       'SSE',
-      _client,
-      _url,
+      _client!,
+      _url!,
       _accessTokenFactory,
       data,
       _logMessageContent,
@@ -112,12 +113,12 @@ class ServerSentEventsTransport implements Transport {
     return Future.value(null);
   }
 
-  void _close({Exception exception}) {
+  void _close({Exception? exception}) {
     if (_sseClient != null) {
       _sseClient = null;
 
       if (onclose != null) {
-        onclose(exception);
+        onclose!(exception);
       }
     }
   }
