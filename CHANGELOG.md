@@ -33,3 +33,7 @@
 ## 1.0.8
 
 - Bug Fixes - [dc767b9](https://github.com/jamiewest/signalr_core/commit/dc767b943a5cf9dee6d464cae5c7e015c99deb50)
+
+## 1.1.0
+
+- Null safety contributed by Mol0ko [#44](https://github.com/jamiewest/signalr_core/commit/7e8eaaf7a7940c60385a076625b75f126a1292d7)
