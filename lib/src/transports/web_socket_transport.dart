@@ -48,8 +48,8 @@ class WebSocketTransport implements Transport {
     _logging!(LogLevel.trace, '(WebSockets transport) Connecting.');
 
     if (_accessTokenFactory != null) {
-      final token = await (_accessTokenFactory!() as FutureOr<String>);
-      if (token.isNotEmpty) {
+      final token = await _accessTokenFactory!();
+      if (token!.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
         url = url! + (url.contains('?') ? '&' : '?') + 'access_token=$encodedToken';
       }
