@@ -37,3 +37,7 @@
 ## 1.1.0
 
 - Null safety contributed by Mol0ko [#44](https://github.com/jamiewest/signalr_core/commit/7e8eaaf7a7940c60385a076625b75f126a1292d7)
+
+## 1.1.1 
+
+- Bug fixes contributed by janjoosse [#49](https://github.com/jamiewest/signalr_core/pull/49)
