@@ -431,7 +431,8 @@ class HubConnection {
       });
       _reconnectDelayHandle = null;
 
-      if (_connectionState == null || _connectionState != HubConnectionState.reconnecting) {
+      if (_connectionState == null ||
+          _connectionState != HubConnectionState.reconnecting) {
         _logger!(LogLevel.debug,
             'Connection left the reconnecting state during reconnect delay. Done reconnecting.');
         return;
@@ -847,6 +848,7 @@ class HubConnection {
       } else {
         return InvocationMessage(
           arguments: args,
+          streamIds: [],
           target: methodName,
         );
       }
@@ -867,6 +869,7 @@ class HubConnection {
         return InvocationMessage(
           arguments: args,
           invocationId: invocationId.toString(),
+          streamIds: [],
           target: methodName,
         );
       }
@@ -894,6 +897,7 @@ class HubConnection {
       return StreamInvocationMessage(
         arguments: args,
         invocationId: invocationId.toString(),
+        streamIds: [],
         target: methodName,
       );
     }
