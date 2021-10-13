@@ -75,7 +75,7 @@ class JsonHubProtocol implements HubProtocol {
           logging!(
               LogLevel.information,
               'Unknown message type \'' +
-                  parsedMessage!.type.toString() +
+                  messageType.toString() +
                   '\' ignored.');
           continue;
       }
