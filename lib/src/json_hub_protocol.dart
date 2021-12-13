@@ -181,8 +181,7 @@ extension InvocationMessageExtensions on InvocationMessage {
   static InvocationMessage fromJson(Map<String, dynamic> json) {
     return InvocationMessage(
       target: json['target'] as String?,
-      arguments:
-          (json['arguments'] as List?)?.map((item) => item as Object).toList(),
+      arguments: json['arguments'] as List?,
       headers: json['headers'] as Map<String, String>?,
       invocationId: json['invocationId'] as String?,
       streamIds: json['streamIds'] as List<String>?,
