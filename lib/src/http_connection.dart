@@ -402,6 +402,10 @@ class HttpConnection implements Connection {
         headers['Authorization'] = 'Bearer $token';
       }
     }
+    
+    if (_options.customHeaders != null) {
+      headers.addAll(_options.customHeaders!);
+    }
 
     final negotiateUrl = _resolveNegotiateUrl(url);
     _logging!(LogLevel.debug, 'Sending negotiation request: $negotiateUrl.');
