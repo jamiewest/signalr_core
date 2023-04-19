@@ -12,6 +12,7 @@ class HttpConnectionOptions {
     this.logMessageContent = false,
     this.skipNegotiation = false,
     this.withCredentials = true,
+    this.customHeaders
   });
 
   /// An [BaseClient] that will be used to make HTTP requests.
@@ -24,6 +25,9 @@ class HttpConnectionOptions {
   ///
   /// Provide an [Logger] instance, and log messages will be logged via that instance.
   final Logging? logging;
+  
+  // custom headers sent with the negotiating HTTP request
+  final Map<String, String>? customHeaders;
 
   /// A function that provides an access token required for HTTP Bearer authentication.
   ///
