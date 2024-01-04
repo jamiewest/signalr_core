@@ -14,10 +14,10 @@ dependencies:
   web_socket_channel: ^2.4.0
   sse_channel:
     git: 
-      url: https://github.com/RCSandberg/sse_channel.git
-      ref: feature/bump-dart-and-package-versions
+      url: https://github.com/jamiewest/sse_channel.git
+      ref: main
   equatable: ^2.0.5
 
 dev_dependencies:
-  lints: ^2.1.1
+  lints: ^3.0.0
   test: ^1.24.4
