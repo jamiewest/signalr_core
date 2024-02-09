@@ -6,7 +6,6 @@ import 'package:signalr_core/src/hub_protocol.dart';
 import 'package:signalr_core/src/logger.dart';
 import 'package:signalr_core/src/retry_policy.dart';
 import 'package:signalr_core/src/utils.dart';
-import 'package:tuple/tuple.dart';
 
 typedef InvocationEventCallback = void Function(
     HubMessage? invocationEvent, Exception? exception);
@@ -296,11 +295,11 @@ class HubConnection {
         methodName: methodName,
         args: args,
         nonblocking: true,
-        streamIds: streamParameters.item2,
+        streamIds: streamParameters.$2,
       ),
     );
 
-    _launchStreams(streamParameters.item1, sendPromise);
+    _launchStreams(streamParameters.$1, sendPromise);
 
     return sendPromise;
   }
@@ -503,7 +502,7 @@ class HubConnection {
   Stream<T?> stream<T>(String methodName, {List<dynamic>? args}) {
     final streamParameters = _replaceStreamParameters(args);
     final invocationDescriptor = _createStreamInvocation(
-        methodName: methodName, args: args, streamIds: streamParameters.item2);
+        methodName: methodName, args: args, streamIds: streamParameters.$2);
 
     late Future<void> futureQueue;
     final controller = StreamController<T?>()
@@ -551,7 +550,7 @@ class HubConnection {
       _callbacks.remove(invocationDescriptor.invocationId);
     });
 
-    _launchStreams(streamParameters.item1, futureQueue);
+    _launchStreams(streamParameters.$1, futureQueue);
 
     return controller.stream;
   }
@@ -567,7 +566,7 @@ class HubConnection {
       methodName: methodName,
       args: args,
       nonblocking: false,
-      streamIds: streamParameters.item2,
+      streamIds: streamParameters.$2,
     );
 
     final p = Completer<dynamic>();
@@ -600,12 +599,12 @@ class HubConnection {
       _callbacks.remove(invocationDescriptor.invocationId);
     });
 
-    _launchStreams(streamParameters.item1, futureQueue);
+    _launchStreams(streamParameters.$1, futureQueue);
 
     return p.future;
   }
 
-  Tuple2<Map<int?, Stream<dynamic>>, List<String>> _replaceStreamParameters(
+  (Map<int?, Stream<dynamic>>, List<String>) _replaceStreamParameters(
       List<dynamic>? args) {
     final streams = <int?, Stream<dynamic>>{};
     final streamIds = <String>[];
@@ -628,7 +627,7 @@ class HubConnection {
       }
     }
 
-    return Tuple2<Map<int?, Stream<dynamic>>, List<String>>(streams, streamIds);
+    return (streams, streamIds);
   }
 
   /// Registers a handler that will be invoked when the hub method with the specified method name is invoked.
@@ -752,8 +751,8 @@ class HubConnection {
 
     try {
       var response = _handshakeProtocol.parseHandshakeResponse(data);
-      remainingData = response.item1;
-      responseMessage = response.item2;
+      remainingData = response.$1;
+      responseMessage = response.$2;
     } catch (e) {
       final message = 'Error parsing handshake response: ' + e.toString();
       _logger!(LogLevel.error, message);

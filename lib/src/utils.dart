@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart';
 import 'package:signalr_core/src/logger.dart';
-import 'package:tuple/tuple.dart';
 
 typedef OnReceive = void Function(dynamic data);
 typedef OnClose = void Function(Exception? error);
@@ -62,7 +61,7 @@ Future<void> sendMessage(
   }
 
   final userAgentHeader = getUserAgentHeader();
-  headers[userAgentHeader.item1] = userAgentHeader.item2;
+  headers[userAgentHeader.$1] = userAgentHeader.$2;
 
   log?.call(LogLevel.trace,
       '($transportName transport) sending data. ${getDataDetail(content, logMessageContent)}.');
@@ -77,12 +76,17 @@ Future<void> sendMessage(
       '($transportName transport) request complete. Response status: ${response?.statusCode}.');
 }
 
-Tuple2<String, String> getUserAgentHeader() {
+(String, String) getUserAgentHeader() {
   var userAgentHeaderName = 'X-SignalR-User-Agent';
-  return Tuple2<String, String>(
-      userAgentHeaderName,
-      _constructUserAgent(
-          version, getOsName(), getRuntime(), getRuntimeVersion()));
+  return (
+    userAgentHeaderName,
+    _constructUserAgent(
+      version,
+      getOsName(),
+      getRuntime(),
+      getRuntimeVersion(),
+    )
+  );
 }
 
 String _constructUserAgent(

@@ -45,7 +45,7 @@ class LongPollingTransport implements Transport {
 
     final headers = <String, String>{};
     final userAgentHeader = getUserAgentHeader();
-    headers[userAgentHeader.item1] = userAgentHeader.item2;
+    headers[userAgentHeader.$1] = userAgentHeader.$2;
 
     final token = await _getAccessToken();
     if (token != null) {
@@ -190,7 +190,7 @@ class LongPollingTransport implements Transport {
 
       final headers = <String, String>{};
       final userAgentHeader = getUserAgentHeader();
-      headers[userAgentHeader.item1] = userAgentHeader.item2;
+      headers[userAgentHeader.$1] = userAgentHeader.$2;
 
       final token = await _getAccessToken();
       if (token != null) {

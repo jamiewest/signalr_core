@@ -9,8 +9,6 @@ environment:
 dependencies:
   http: ^1.2.0
   logging: ^1.2.0
-  meta: ^1.9.1
-  tuple: ^2.0.2
   web_socket_channel: ^2.4.3
   sse_channel: ^0.1.1
   equatable: ^2.0.5

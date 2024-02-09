@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:signalr_core/src/text_message_format.dart';
-import 'package:tuple/tuple.dart';
 
 class HandshakeRequestMessage {
   HandshakeRequestMessage({
@@ -45,8 +44,7 @@ class HandshakeProtocol {
     return TextMessageFormat.write(json.encode(handshakeRequest.toJson()));
   }
 
-  Tuple2<dynamic, HandshakeResponseMessage> parseHandshakeResponse(
-      dynamic data) {
+  (dynamic, HandshakeResponseMessage) parseHandshakeResponse(dynamic data) {
     HandshakeResponseMessage _responseMessage;
     String _messageData;
     dynamic _remainingData;
@@ -93,7 +91,7 @@ class HandshakeProtocol {
 
     _responseMessage = response;
 
-    return Tuple2<dynamic, HandshakeResponseMessage>(
+    return (
       _remainingData,
       _responseMessage,
     );
