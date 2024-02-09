@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:signalr_core/src/connection.dart';
 import 'package:signalr_core/src/http_connection_options.dart';
 import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/transports/long_polling_transport.dart';
 import 'package:signalr_core/src/transports/server_sent_events_transport.dart';
 import 'package:signalr_core/src/transports/web_socket_transport.dart';
-import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 
 enum ConnectionState {
@@ -119,7 +119,7 @@ class HttpConnection implements Connection {
   HttpConnection({
     required String? url,
     required HttpConnectionOptions options,
-  })   : baseUrl = url,
+  })  : baseUrl = url,
         _client = (options.client != null)
             ? options.client
             : http.Client() as http.BaseClient,
@@ -402,7 +402,7 @@ class HttpConnection implements Connection {
         headers['Authorization'] = 'Bearer $token';
       }
     }
-    
+
     if (_options.customHeaders != null) {
       headers.addAll(_options.customHeaders!);
     }

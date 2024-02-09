@@ -44,7 +44,7 @@ class ServerSentEventsTransport implements Transport {
     _url = url;
 
     if (_accessTokenFactory != null) {
-      final token = await _accessTokenFactory!();
+      final token = await _accessTokenFactory();
       if (token != null && _url != null) {
         _url = _url! +
             (!url!.contains('?') ? '?' : '&') +
@@ -65,7 +65,7 @@ class ServerSentEventsTransport implements Transport {
     SseChannel channel;
     try {
       channel = SseChannel.connect(Uri.parse(url!));
-      _log!(LogLevel.information, 'SSE connected to $_url');
+      _log(LogLevel.information, 'SSE connected to $_url');
       opened = true;
       _sseChannel = channel;
       completer.complete();
@@ -74,7 +74,7 @@ class ServerSentEventsTransport implements Transport {
     }
 
     _sseChannel!.stream.listen((data) {
-      _log!(LogLevel.trace,
+      _log(LogLevel.trace,
           '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
       onreceive!(data);
     }, onError: (e) {

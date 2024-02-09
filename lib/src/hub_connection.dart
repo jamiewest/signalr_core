@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:signalr_core/signalr_core.dart';
 import 'package:signalr_core/src/connection.dart';
 import 'package:signalr_core/src/handshake_protocol.dart';
 import 'package:signalr_core/src/hub_protocol.dart';
 import 'package:signalr_core/src/logger.dart';
 import 'package:signalr_core/src/retry_policy.dart';
+import 'package:signalr_core/src/utils.dart';
 import 'package:tuple/tuple.dart';
 
 typedef InvocationEventCallback = void Function(
@@ -80,7 +80,7 @@ class HubConnection {
 
     _handshakeProtocol = HandshakeProtocol();
     if (_connection != null) {
-      _connection!
+      _connection
         ..onreceive = _processIncomingData
         ..onclose =
             (Exception? exception) => _connectionClosed(exception: exception);
@@ -155,10 +155,10 @@ class HubConnection {
 
       _connectionState = HubConnectionState.connected;
       _connectionStarted = true;
-      _logger!(LogLevel.debug, 'HubConnection connected successfully.');
+      _logger(LogLevel.debug, 'HubConnection connected successfully.');
     } catch (e) {
       _connectionState = HubConnectionState.disconnected;
-      _logger!(LogLevel.debug,
+      _logger(LogLevel.debug,
           'HubConnection failed to start successfully because of error \'{$e.toString()}\'.');
       return Future.error(e);
     }
@@ -190,8 +190,7 @@ class HubConnection {
       await _sendMessage(
           _handshakeProtocol.writeHandshakeRequest(handshakeRequest));
 
-      _logger!(
-          LogLevel.information, 'Using HubProtocol \'${_protocol.name}\'.');
+      _logger(LogLevel.information, 'Using HubProtocol \'${_protocol.name}\'.');
 
       // defensively cleanup timeout in case we receive a message from the server before we finish start
       _cleanupTimeout();
@@ -218,7 +217,7 @@ class HubConnection {
 
       // HttpConnection.stop() should not complete until after the onclose callback is invoked.
       // This will transition the HubConnection to the disconnected state before HttpConnection.stop() completes.
-      await _connection!.stop(exception: e as Exception);
+      await _connection.stop(exception: e as Exception);
       rethrow;
     }
   }
@@ -260,7 +259,7 @@ class HubConnection {
       // We're in a reconnect delay which means the underlying connection is currently already stopped.
       // Just clear the handle to stop the reconnect loop (which no one is waiting on thankfully) and
       // fire the onclose callbacks.
-      _logger!(LogLevel.debug,
+      _logger(LogLevel.debug,
           'Connection stopped during reconnect delay. Done reconnecting.');
 
       _clearTimeout(_reconnectDelayHandle);
@@ -338,7 +337,7 @@ class HubConnection {
 
   void _resetTimeoutPeriod() {
     if ((_connection!.features != null) ||
-        (_connection!.features.inherentKeepAlive == false)) {
+        (_connection.features.inherentKeepAlive == false)) {
       // Set the timeout timer
       _timeoutHandle = Timer.periodic(
           Duration(milliseconds: serverTimeoutInMilliseconds), (Timer timer) {
@@ -408,19 +407,19 @@ class HubConnection {
         callback(exception);
       }
     } catch (e) {
-      _logger!(LogLevel.error,
+      _logger(LogLevel.error,
           'An onreconnecting callback called with error \'${exception.toString()}\' threw error \'${e.toString()}\'.');
     }
 
     // Exit early if an onreconnecting callback called connection.stop().
     if (_connectionState != HubConnectionState.reconnecting) {
-      _logger!(LogLevel.debug,
+      _logger(LogLevel.debug,
           'Connection left the reconnecting state in onreconnecting callback. Done reconnecting.');
       return;
     }
 
     while (nextRetryDelay != null) {
-      _logger!(LogLevel.information,
+      _logger(LogLevel.information,
           'Reconnect attempt number $previousReconnectAttempts will start in $nextRetryDelay ms.');
 
       await Future(() {
@@ -433,7 +432,7 @@ class HubConnection {
 
       if (_connectionState == null ||
           _connectionState != HubConnectionState.reconnecting) {
-        _logger!(LogLevel.debug,
+        _logger(LogLevel.debug,
             'Connection left the reconnecting state during reconnect delay. Done reconnecting.');
         return;
       }
@@ -442,7 +441,7 @@ class HubConnection {
         await _startInternal();
 
         _connectionState = HubConnectionState.connected;
-        _logger!(
+        _logger(
             LogLevel.information, 'HubConnection reconnected successfully.');
 
         try {
@@ -450,17 +449,17 @@ class HubConnection {
             callback(_connection!.connectionId);
           }
         } catch (e) {
-          _logger!(LogLevel.error,
+          _logger(LogLevel.error,
               'An onreconnected callback called with connectionId \'${_connection!.connectionId}; threw error \'${e.toString()}\'.');
         }
 
         return;
       } catch (e) {
-        _logger!(LogLevel.information,
+        _logger(LogLevel.information,
             'Reconnect attempt failed because of error \'${e.toString()}\'.');
 
         if (_connectionState != HubConnectionState.reconnecting) {
-          _logger!(LogLevel.debug,
+          _logger(LogLevel.debug,
               'Connection left the reconnecting state during reconnect attempt. Done reconnecting.');
           return;
         }
@@ -474,7 +473,7 @@ class HubConnection {
       }
     }
 
-    _logger!(LogLevel.information,
+    _logger(LogLevel.information,
         'Reconnect retries have been exhausted after ${reconnectStartTime.elapsedMilliseconds} ms and $previousReconnectAttempts failed attempts. Connection disconnecting.');
 
     _completeClose();
