@@ -41,3 +41,7 @@
 ## 1.1.1 
 
 - Bug fixes contributed by janjoosse [#49](https://github.com/jamiewest/signalr_core/pull/49)
+
+## 1.1.2
+
+- Updated packages
