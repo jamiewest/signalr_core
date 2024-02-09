@@ -275,9 +275,11 @@ class HttpConnection implements Connection {
     }
 
     if (_connectionState == ConnectionState.disconnecting) {
-      // A call to stop() induced this call to stopConnection and needs to be completed.
-      // Any stop() awaiters will be scheduled to continue after the onclose callback fires.
-      _stopCompleter.complete();
+      if (!_stopCompleter.isCompleted) {
+        // A call to stop() induced this call to stopConnection and needs to be completed.
+        // Any stop() awaiters will be scheduled to continue after the onclose callback fires.
+        _stopCompleter.complete();
+      }
     }
 
     if (_exception != null) {
