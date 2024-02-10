@@ -2,7 +2,8 @@ import 'package:signalr_core/signalr_core.dart';
 
 /// Specifies a specific HTTP transport type.
 ///
-/// This will be treated as a bit flag in the future, so we keep it using power-of-two values.
+/// This will be treated as a bit flag in the future, so we keep it using
+/// power-of-two values.
 enum HttpTransportType {
   /// Specifies no transport preference.
   none, // 0
@@ -66,7 +67,8 @@ extension TransferFormatExtensions on TransferFormat {
 
 /// An abstraction over the behavior of transports.
 ///
-/// This is designed to support the framework and not intended for use by applications.
+/// This is designed to support the framework and not intended for use by
+/// applications.
 abstract class Transport {
   Future<void> connect(String? url, TransferFormat? transferFormat);
   Future<void> send(dynamic data);

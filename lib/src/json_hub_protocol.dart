@@ -46,28 +46,23 @@ class JsonHubProtocol implements HubProtocol {
 
       switch (messageType) {
         case MessageType.invocation:
-          parsedMessage = InvocationMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = InvocationMessageExtensions.fromJson(jsonData);
           _isInvocationMessage(parsedMessage as InvocationMessage);
           break;
         case MessageType.streamItem:
-          parsedMessage = StreamItemMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = StreamItemMessageExtensions.fromJson(jsonData);
           _isStreamItemMessage(parsedMessage as StreamItemMessage);
           break;
         case MessageType.completion:
-          parsedMessage = CompletionMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = CompletionMessageExtensions.fromJson(jsonData);
           _isCompletionMessage(parsedMessage as CompletionMessage);
           break;
         case MessageType.ping:
-          parsedMessage =
-              PingMessageExtensions.fromJson(jsonData);
+          parsedMessage = PingMessageExtensions.fromJson(jsonData);
           // Single value, no need to validate
           break;
         case MessageType.close:
-          parsedMessage =
-              CloseMessageExtensions.fromJson(jsonData);
+          parsedMessage = CloseMessageExtensions.fromJson(jsonData);
           // All optional values, no need to validate
           break;
         default:
@@ -190,7 +185,7 @@ extension InvocationMessageExtensions on InvocationMessage {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       if (invocationId != null) 'invocationId': invocationId,
       'target': target,
       'arguments': arguments ?? [],
@@ -202,7 +197,7 @@ extension InvocationMessageExtensions on InvocationMessage {
 extension StreamInvocationMessageExtensions on StreamInvocationMessage {
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       'invocationId': invocationId,
       'target': target,
       'arguments': arguments,
@@ -222,7 +217,7 @@ extension StreamItemMessageExtensions on StreamItemMessage {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       'item': item,
       'invocationId': invocationId,
     };
@@ -232,7 +227,7 @@ extension StreamItemMessageExtensions on StreamItemMessage {
 extension CancelInvocationMessageExtensions on CancelInvocationMessage {
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       'invocationId': invocationId,
     };
   }
@@ -250,7 +245,7 @@ extension CompletionMessageExtensions on CompletionMessage {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       'invocationId': invocationId,
       'result': result,
       'error': error,
@@ -265,7 +260,7 @@ extension PingMessageExtensions on PingMessage {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
     };
   }
 }
@@ -277,7 +272,7 @@ extension CloseMessageExtensions on CloseMessage {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.value,
+      'type': type?.value,
       'error': error,
     };
   }

@@ -8,7 +8,8 @@ class HubConnectionBuilder {
   String? _url;
   RetryPolicy? reconnectPolicy;
 
-  /// Configures the [HubConnection] to use HTTP-based transports to connect to the specified URL.
+  /// Configures the [HubConnection] to use HTTP-based transports to connect
+  /// to the specified URL.
   // ignore: avoid_returning_this
   HubConnectionBuilder withUrl(String url, [dynamic transportTypeOrOptions]) {
     _url = url;
@@ -31,7 +32,8 @@ class HubConnectionBuilder {
     return this;
   }
 
-  /// Configures the [HubConnection] to automatically attempt to reconnect if the connection is lost.
+  /// Configures the [HubConnection] to automatically attempt to reconnect if
+  /// the connection is lost.
   // ignore: avoid_returning_this
   HubConnectionBuilder withAutomaticReconnect(
       [dynamic retryDelaysOrReconnectPolicy]) {
@@ -52,12 +54,15 @@ class HubConnectionBuilder {
     return this;
   }
 
-  /// Creates a [HubConnection] from the configuration options specified in this builder.
+  /// Creates a [HubConnection] from the configuration options specified in
+  /// this builder.
   HubConnection build() {
     // Now create the connection
     if (_url == null) {
       throw Exception(
-          'The \'HubConnectionBuilder.withUrl\' method must be called before building the connection.');
+        'The \'HubConnectionBuilder.withUrl\' method must be called '
+        'before building the connection.',
+      );
     }
 
     _httpConnectionOptions ??=

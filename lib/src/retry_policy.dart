@@ -1,4 +1,5 @@
-/// An abstraction that controls when the client attempts to reconnect and how many attempts to do so.
+/// An abstraction that controls when the client attempts to reconnect and
+/// how many attempts to do so.
 abstract class RetryPolicy {
   /// Called after the transport loses the connection.
   int? nextRetryDelayInMilliseconds(RetryContext retryContext);

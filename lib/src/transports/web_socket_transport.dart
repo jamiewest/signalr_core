@@ -51,9 +51,8 @@ class WebSocketTransport implements Transport {
       final token = await _accessTokenFactory();
       if (token!.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
-        url = url! +
-            (url.contains('?') ? '&' : '?') +
-            'access_token=$encodedToken';
+        url =
+            '${url!}${url.contains('?') ? '&' : '?'}access_token=$encodedToken';
       }
     }
 
@@ -97,8 +96,11 @@ class WebSocketTransport implements Transport {
       return Future.error(Exception('WebSocket is not in the OPEN state'));
     }
 
-    _logging!(LogLevel.trace,
-        '(WebSockets transport) sending data. ${getDataDetail(data, _logMessageContent)}.');
+    _logging!(
+      LogLevel.trace,
+      '(WebSockets transport) sending data. '
+      '${getDataDetail(data, _logMessageContent)}.',
+    );
     _channel!.sink.add(data);
     return Future.value();
   }
@@ -131,7 +133,9 @@ class WebSocketTransport implements Transport {
         if (closeCode != 0 && closeCode != 1000) {
           onclose!(
             Exception(
-                'WebSocket closed with status code: $closeCode ($closeReason).'),
+              'WebSocket closed with status code: '
+              '$closeCode ($closeReason).',
+            ),
           );
         }
         onclose!(null);

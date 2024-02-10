@@ -53,15 +53,20 @@ class LongPollingTransport implements Transport {
     }
 
     // Make initial long polling request
-    // Server uses first long polling request to finish initializing connection and it returns without data
+    // Server uses first long polling request to finish initializing connection
+    //and it returns without data
     final pollUrl = '$url&_=${DateTime.now().millisecondsSinceEpoch}';
     _log?.call(LogLevel.trace, '(LongPolling transport) polling: $pollUrl.');
     final response = await _client!.get(Uri.parse(pollUrl), headers: headers);
     if (response.statusCode != 200) {
-      _log?.call(LogLevel.error,
-          '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
+      _log?.call(
+        LogLevel.error,
+        '(LongPolling transport) Unexpected response code: '
+        '${response.statusCode}.',
+      );
 
-      // Mark running as false so that the poll immediately ends and runs the close logic
+      // Mark running as false so that the poll immediately ends and
+      //runs the close logic
       _closeError = Exception(response.statusCode);
       _running = false;
     } else {
@@ -106,8 +111,11 @@ class LongPollingTransport implements Transport {
 
           _running = false;
         } else if (response.statusCode != 200) {
-          _log?.call(LogLevel.error,
-              '(LongPolling transport) Unexpected response code: ${response.statusCode}.');
+          _log?.call(
+            LogLevel.error,
+            '(LongPolling transport) Unexpected response code: '
+            '${response.statusCode}.',
+          );
 
           // Unexpected status code
           _closeError = Exception(response.statusCode);
@@ -115,8 +123,11 @@ class LongPollingTransport implements Transport {
         } else {
           // Process the response
           if (response.body.isNotEmpty) {
-            _log?.call(LogLevel.trace,
-                '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
+            _log?.call(
+              LogLevel.trace,
+              '(LongPolling transport) data received. '
+              '${getDataDetail(response.body, _logMessageContent)}.',
+            );
 
             if (onreceive != null) {
               onreceive!(response.body);
@@ -147,8 +158,10 @@ class LongPollingTransport implements Transport {
     } finally {
       _log?.call(LogLevel.trace, '(LongPolling transport) Polling complete.');
 
-      // We will reach here with pollAborted==false when the server returned a response causing the transport to stop.
-      // If pollAborted==true then client initiated the stop and the stop method will raise the close event after DELETE is sent.
+      // We will reach here with pollAborted==false when the server returned a
+      // response causing the transport to stop. If pollAborted==true then
+      // client initiated the stop and the stop method will raise the close
+      // event after DELETE is sent.
       // if (_pollAborted) {
       //   _raiseOnClose();
       // }
@@ -177,7 +190,8 @@ class LongPollingTransport implements Transport {
   Future<void> stop() async {
     _log?.call(LogLevel.trace, '(LongPolling transport) Stopping polling.');
 
-    // Tell receiving loop to stop, abort any current request, and then wait for it to finish
+    // Tell receiving loop to stop, abort any current request, and then wait
+    // for it to finish
     _running = false;
     //_pollAbort.abort();
 
@@ -214,7 +228,7 @@ class LongPollingTransport implements Transport {
     if (onclose != null) {
       var logMessage = '(LongPolling transport) Firing onclose event.';
       if (_closeError != null) {
-        logMessage += ' Error: ' + _closeError.toString();
+        logMessage += ' Error: $_closeError';
       }
       _log?.call(LogLevel.trace, logMessage);
       onclose!(_closeError);

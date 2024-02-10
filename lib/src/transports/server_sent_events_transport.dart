@@ -40,14 +40,14 @@ class ServerSentEventsTransport implements Transport {
   Future<void> connect(String? url, TransferFormat? transferFormat) async {
     _log!(LogLevel.trace, '(SSE transport) Connecting.');
 
-    // set url before accessTokenFactory because this.url is only for send and we set the auth header instead of the query string for send
+    // set url before accessTokenFactory because this.url is only for send
+    //and we set the auth header instead of the query string for send
     _url = url;
 
     if (_accessTokenFactory != null) {
       final token = await _accessTokenFactory();
       if (token != null && _url != null) {
-        _url = _url! +
-            (!url!.contains('?') ? '?' : '&') +
+        _url = '${_url!}${!url!.contains('?') ? '?' : '&'}'
             'access_token=${Uri.encodeComponent(token)}';
       }
     }
@@ -58,7 +58,9 @@ class ServerSentEventsTransport implements Transport {
     if (transferFormat != TransferFormat.text) {
       return completer.completeError(
         Exception(
-            'The Server-Sent Events transport only supports the \'Text\' transfer format'),
+          'The Server-Sent Events transport only supports '
+          'the \'Text\' transfer format',
+        ),
       );
     }
 
@@ -74,8 +76,11 @@ class ServerSentEventsTransport implements Transport {
     }
 
     _sseChannel!.stream.listen((data) {
-      _log(LogLevel.trace,
-          '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
+      _log(
+        LogLevel.trace,
+        '(SSE transport) data received. '
+        '${getDataDetail(data, _logMessageContent)}',
+      );
       onreceive!(data);
     }, onError: (e) {
       if (opened) {
