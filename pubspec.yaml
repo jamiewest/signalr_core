@@ -4,7 +4,7 @@ version: 1.0.8
 homepage: https://github.com/jamiewest/signalr_core
 
 environment:
-  sdk: '>=2.6.0 <3.0.0'
+  sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
   http: ^0.12.1
