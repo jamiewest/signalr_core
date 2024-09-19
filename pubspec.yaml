@@ -12,8 +12,6 @@ dependencies:
   web_socket_channel: ^3.0.1
   sse_channel: ^0.1.1
   equatable: ^2.0.5
-  meta: ^1.15.0
-  tuple: ^2.0.2
 
 dev_dependencies:
   lints: ^4.0.0
