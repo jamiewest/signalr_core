@@ -1,4 +1,5 @@
-/// Log Levels are ordered in increasing severity. So `Debug` is more severe than `Trace`, etc.
+/// Log Levels are ordered in increasing severity. So `Debug` is
+/// more severe than `Trace`, etc.
 enum LogLevel {
   /// Log level for very low severity diagnostic messages.
   trace,
@@ -12,12 +13,15 @@ enum LogLevel {
   /// Log level for diagnostic messages that indicate a non-fatal problem.
   warning,
 
-  /// Log level for diagnostic messages that indicate a failure in the current operation.
+  /// Log level for diagnostic messages that indicate a failure in the
+  /// current operation.
   error,
 
-  /// Log level for diagnostic messages that indicate a failure that will terminate the entire application.
+  /// Log level for diagnostic messages that indicate a failure that will
+  /// terminate the entire application.
   critical,
 
-  /// The highest possible log level. Used when configuring logging to indicate that no log messages should be emitted.
+  /// The highest possible log level. Used when configuring logging to
+  /// indicate that no log messages should be emitted.
   none,
 }
