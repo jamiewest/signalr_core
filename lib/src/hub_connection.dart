@@ -1090,7 +1090,8 @@ class HubConnection {
   }
 
   void _invokeClientMethod(InvocationMessage invocationMessage) {
-    final methods = _methods[invocationMessage.target!.toLowerCase()];
+    final methods =
+        _methods[invocationMessage.target?.toLowerCase()] ?? _methods['*'];
 
     if (methods != null) {
       try {
